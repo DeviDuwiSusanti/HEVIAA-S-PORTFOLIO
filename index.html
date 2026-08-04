@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=1240">
 <title>Heru — AI Content Creator</title>
 <meta name="description" content="Heru — AI Content Creator specializing in AI Animation, Product Commercials, Educational Content and Motion Videos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -527,6 +527,119 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
 .reveal{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease,transform 0.7s ease;}
 .reveal.in{opacity:1;transform:translateY(0);}
 
+/* ============================================
+   MOBILE RESPONSIVE — efficient spacing & sizing
+   Targets phones (<=760px) and small phones (<=420px)
+   so nothing feels oversized, cramped, or wastes
+   vertical space when opened on a handset.
+   ============================================ */
+@media (max-width:760px){
+  .wrap{padding:0 18px;}
+
+  /* Sections: desktop uses 140px top/bottom padding — far too much
+     scroll distance on a phone. Tighten it up per-section instead. */
+  section{padding:76px 0;}
+  section:first-of-type{padding-top:0;}
+  .section-title{font-size:clamp(24px,7vw,32px);margin-bottom:10px;}
+  .section-sub{font-size:14px;margin-bottom:34px;}
+  .eyebrow{margin-bottom:14px;font-size:11px;}
+
+  /* Header/nav: shrink the floating pill and hide the label text on
+     the CV button so it doesn't force horizontal squeeze */
+  header{top:10px;padding:0 12px;}
+  nav{padding:6px 6px 6px 12px;}
+  .nav-logo{font-size:13px;margin-right:8px;}
+  .nav-cv{padding:8px 12px;font-size:11px;}
+  .theme-toggle{width:30px;height:30px;}
+
+  /* Hero: cut the huge top padding, keep the visual smaller so the
+     fold isn't dominated by a single decorative panel */
+  #hero{padding-top:110px;padding-bottom:56px;}
+  .hero-grid{gap:32px;}
+  h1.hero-name{font-size:clamp(34px,10vw,48px);margin-bottom:14px;}
+  .hero-hi{font-size:13px;}
+  .hero-role{font-size:12px;margin-bottom:16px;}
+  .hero-desc{font-size:15px;max-width:100%;margin-bottom:12px;}
+  .hero-meta{gap:12px;margin-bottom:26px;font-size:12.5px;}
+  .hero-ctas{gap:10px;}
+  .btn{padding:11px 18px;font-size:13px;flex:1 1 auto;justify-content:center;}
+  .hero-visual{aspect-ratio:16/11;}
+  .hero-photo .avatar-fallback{font-size:64px;}
+  .hero-frame-tag{bottom:14px;left:14px;right:14px;padding:7px 11px;font-size:10px;}
+  .status-pill{margin-bottom:18px;font-size:11px;padding:5px 12px 5px 9px;}
+
+  /* Showreel: shorter aspect ratio so the player doesn't dominate the
+     whole screen, and tuck controls in tighter */
+  #showreel{padding-top:56px;padding-bottom:56px;}
+  .reel-player{aspect-ratio:4/3;}
+  .reel-overlay{padding:16px;}
+  .reel-play-btn{width:56px;height:56px;font-size:18px;}
+  .reel-badge,.reel-tc{font-size:10px;padding:5px 10px;}
+  .reel-tags{gap:6px;}
+  .reel-tags span{font-size:10px;padding:5px 9px;}
+  .reel-bottom{gap:12px;}
+
+  /* Portfolio: single column already applies at 640px; tighten card
+     internals so titles/meta don't feel loose */
+  .filters{gap:8px;margin-bottom:28px;}
+  .filter-btn{font-size:11.5px;padding:8px 14px;}
+  .portfolio-grid{gap:16px;}
+  .pf-body{padding:12px 14px 16px;}
+  .pf-title{font-size:14.5px;}
+  .pf-cat-tag,.pf-orient-tag{font-size:9.5px;padding:4px 8px;}
+  .pf-thumb-play span{width:44px;height:44px;font-size:14px;}
+
+  /* Featured list: stack cleanly, trim padding */
+  .featured-list{margin-bottom:48px;}
+  .feat-row{padding:16px 16px;gap:6px;}
+  .feat-info h3{font-size:16px;}
+  .feat-info p{font-size:12.5px;}
+
+  /* Pipeline: vertical layout already kicks in at 680px; trim gaps */
+  .pipeline{gap:20px;padding:12px 0 6px;}
+  .pipe-label{font-size:11px;}
+
+  /* Stats banner: stack number and caption, shrink side stats so the
+     row doesn't wrap awkwardly */
+  .stat-banner{gap:22px;margin-bottom:36px;}
+  .stat-number{font-size:clamp(36px,13vw,48px);}
+  .stat-caption{font-size:13px;max-width:100%;}
+  .stat-side{gap:20px;}
+  .stat-side-item strong{font-size:20px;}
+
+  /* Brand cards: smaller pills, tighter logo */
+  .brands-marquee{gap:10px;}
+  .brand-card{padding:6px 22px 6px 6px;gap:9px;}
+  .brand-logo{width:36px;height:36px;font-size:11px;}
+  .brand-name{font-size:13px;}
+
+  /* Social cards: reduce internal padding + stat sizes */
+  .social-grid{gap:14px;}
+  .social-card{padding:20px;gap:14px;}
+  .social-icon{width:36px;height:36px;font-size:13px;border-radius:8px;}
+  .social-stats{gap:18px;}
+  .social-stats strong{font-size:19px;}
+
+  /* Contact + footer: tighten spacing, keep CTAs full-width friendly */
+  .contact-title{font-size:clamp(26px,8vw,36px);margin-bottom:22px;}
+  .contact-ctas{gap:10px;}
+  .contact-ctas .btn{flex:1 1 auto;}
+  footer{padding:36px 0 28px;}
+  .footer-grid{gap:18px;justify-content:center;text-align:center;}
+  .footer-left{align-items:center;}
+  .footer-nav{justify-content:center;}
+  .footer-social{justify-content:center;flex-wrap:wrap;}
+}
+
+@media (max-width:420px){
+  .wrap{padding:0 14px;}
+  h1.hero-name{font-size:9.5vw;}
+  .hero-ctas .btn{width:100%;}
+  .contact-ctas .btn{width:100%;}
+  .hero-meta{flex-direction:column;gap:8px;}
+  .reel-player{aspect-ratio:1/1;}
+  .stat-side{width:100%;justify-content:space-between;}
+}
 </style>
 </head>
 <body>
