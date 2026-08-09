@@ -655,6 +655,7 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
       <button class="filter-btn" data-filter="story">Story</button>
       <button class="filter-btn" data-filter="animation-commercial">Animation Commercial</button>
       <button class="filter-btn" data-filter="realistic-commercial">Realistic Commercial</button>
+      <button class="filter-btn" data-filter="asmr">Asmr</button>
     </div>
     <div class="portfolio-grid" id="portfolio-grid"></div>
   </div>
@@ -885,6 +886,8 @@ const VIDEO_CONFIG = {
     "Pressure": "https://youtube.com/shorts/I22RwkUhYkA?si=MNIaEruTSDs7OkZM",
     "origin": "https://youtube.com/shorts/-x2oD4nHu-0?feature=share",
     "blueprint-for-the-future": "https://youtu.be/W77z6n45k8g?si=UkaKIRoafbcBEdmo",
+    "making-lunchbox": "https://youtube.com/shorts/ruzJI9uKbJg?feature=share",
+    "restocking-fridge": "https://youtube.com/shorts/3XSGa8UvXTc?feature=share",
   }
 };
 
@@ -1115,6 +1118,8 @@ document.querySelectorAll('.btn').forEach(btn=>{
   {title:"This Pressure is Not a Punishment.", cat:"story", label:"Story", year:"2026", hue:14, slug:"Pressure", orientation:"landscape"},
   {title:"Origin Coconut Oil", cat:"realistic-commercial", label:"Commercial", year:"2026", hue:18, slug:"origin", orientation:"landscape"},
   {title:"Blueprint For the Future", cat:"story", label:"Story", year:"2026", hue:14, slug:"blueprint-for-the-future", orientation:"landscape"},
+  {title:"Making a Simple Lunchbox", cat:"asmr", label:"Asmr", year:"2026", hue:19, slug:"making-lunchbox", orientation:"landscape"},
+  {title:"Restocking My Fridge", cat:"asmr", label:"Asmr", year:"2026", hue:19, slug:"restocking-fridge", orientation:"landscape"},
 ];
 
 const featured = [
