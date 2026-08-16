@@ -886,8 +886,11 @@ const VIDEO_CONFIG = {
     "Pressure": "https://youtube.com/shorts/I22RwkUhYkA?si=MNIaEruTSDs7OkZM",
     "origin": "https://youtube.com/shorts/-x2oD4nHu-0?feature=share",
     "blueprint-for-the-future": "https://youtu.be/W77z6n45k8g?si=UkaKIRoafbcBEdmo",
-    "making-lunchbox": "https://youtube.com/shorts/ruzJI9uKbJg?feature=share",
-    "restocking-fridge": "https://youtube.com/shorts/3XSGa8UvXTc?feature=share",
+    "making-dessert": "https://youtube.com/shorts/iFPqGq3sJRg?si=hp4C02EPu87DXZNh",
+    "cooking-seblak": "https://youtube.com/shorts/BbwAkm9a6DA?si=mK5qt5o5m4dAV8Tt",
+    "garden-harvest":"https://youtube.com/shorts/CNU3fCcALEA?si=xgQKEBav20WBriDn",
+    "supermarket":"https://youtube.com/shorts/uSrjwdkSRhg?si=fCCVY28eOvl4ddD-",
+    "grace":"https://youtube.com/shorts/bPLnEkwZmJk",
   }
 };
 
@@ -973,6 +976,7 @@ const BRANDS_CONFIG = [
   { name: "Grace And Glow", logo: "assets/brands/graceandglow.png" },
   { name: "OMG", logo: "assets/brands/omg.png" },
   { name: "O.TWO.O", logo: "assets/brands/two.png" },
+  { name: "Rintik", logo: "assets/brands/rintik.png" },
   { name: "Elformula", logo: "assets/brands/elformula.png" },
   { name: "LumiXpert", logo: "assets/brands/lumiXpert.png" },
   { name: "Next Prime", logo: "assets/brands/nextprime.png" },
@@ -1087,13 +1091,19 @@ document.querySelectorAll('.btn').forEach(btn=>{
 })();
 
 /* ===========================================================
-   DATA
-   =========================================================== */
-   const projects = [
+DATA
+=========================================================== */
+const projects = [
   {title:"Reasons Why Makeup Smudges Easily", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"Reasons-Why-Makeup-Smudges-Easily", orientation:"landscape"},
   {title:"Comedo", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"Comedo", orientation:"landscape"},
   {title:"Tips for Applying Lipstick", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"Tips-for-Applying-Lipstick", orientation:"landscape"},
   {title:"Natural Tips for Treating Acne", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"Natural-Tips-for-Treating-Acne", orientation:"landscape"},
+  {title:"Garden Harvest 🌿🍓🥕", cat:"asmr", label:"Asmr", year:"2026", hue:19, slug:"garden-harvest", orientation:"landscape"},
+  {title:"Cooking Spicy Seblak 🌶️🍜🎧", cat:"asmr", label:"Asmr", year:"2026", hue:19, slug:"cooking-seblak", orientation:"landscape"},
+  {title:"Supermarket Grocery Shopping 🛒🎧", cat:"asmr", label:"Asmr", year:"2026", hue:19, slug:"supermarket", orientation:"landscape"},
+  {title:"Making a Fruit Dessert 🍓🥝🍊🎧", cat:"asmr", label:"Asmr", year:"2026", hue:19, slug:"making-dessert", orientation:"landscape"},
+  {title:"Origin Coconut Oil", cat:"realistic-commercial", label:"Commercial", year:"2026", hue:18, slug:"origin", orientation:"landscape"},
+  {title:"Grace And Glow", cat:"realistic-commercial", label:"Commercial", year:"2026", hue:18, slug:"grace", orientation:"landscape"},
   {title:"Types of Facial Skin", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"Types-of-facial-skin", orientation:"landscape"},
   {title:"What is Niacinamide?", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"What-is-niacinamide?", orientation:"landscape"},
   {title:"Facerinna Glowing Set", cat:"animation-commercial", label:"Commercial", year:"2026", hue:14, slug:"Facerinna-Glowing-Set", orientation:"landscape"},
@@ -1116,10 +1126,7 @@ document.querySelectorAll('.btn').forEach(btn=>{
   {title:"Makarizo Shampoo", cat:"animation-commercial", label:"Commercial", year:"2026", hue:14, slug:"Makarizo-Shampoo", orientation:"landscape"},
   {title:"The Beauty of Becoming", cat:"story", label:"Story", year:"2026", hue:14, slug:"The-Beauty-of-Becoming", orientation:"landscape"},
   {title:"This Pressure is Not a Punishment.", cat:"story", label:"Story", year:"2026", hue:14, slug:"Pressure", orientation:"landscape"},
-  {title:"Origin Coconut Oil", cat:"realistic-commercial", label:"Commercial", year:"2026", hue:18, slug:"origin", orientation:"landscape"},
   {title:"Blueprint For the Future", cat:"story", label:"Story", year:"2026", hue:14, slug:"blueprint-for-the-future", orientation:"landscape"},
-  {title:"Making a Simple Lunchbox", cat:"asmr", label:"Asmr", year:"2026", hue:19, slug:"making-lunchbox", orientation:"landscape"},
-  {title:"Restocking My Fridge", cat:"asmr", label:"Asmr", year:"2026", hue:19, slug:"restocking-fridge", orientation:"landscape"},
 ];
 
 const featured = [
