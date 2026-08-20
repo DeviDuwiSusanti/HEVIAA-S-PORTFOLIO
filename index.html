@@ -8,6 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- PDF.js — used to render page 1 of PDF certificates as a preview thumbnail
+     in the Certificates section. Loaded from CDN, no build step needed. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 /* ============================================
    TOKENS
@@ -92,17 +95,6 @@ body{
   background:radial-gradient(600px circle at var(--mx,50%) var(--my,50%),rgba(69,224,196,0.06),transparent 70%);
   transition:background 0.1s ease;
 }
-
-/* Custom cursor (desktop only) */
-.cursor-dot,.cursor-ring{
-  position:fixed;top:0;left:0;pointer-events:none;z-index:9999;
-  border-radius:50%;transform:translate(-50%,-50%);
-  will-change:transform;
-}
-.cursor-dot{width:5px;height:5px;background:var(--teal);}
-.cursor-ring{width:34px;height:34px;border:1px solid rgba(69,224,196,0.5);transition:width 0.25s ease,height 0.25s ease,border-color 0.25s ease,opacity 0.25s ease;}
-.cursor-ring.hover{width:56px;height:56px;border-color:var(--coral);background:rgba(255,91,61,0.08);}
-@media (hover:none),(pointer:coarse){.cursor-dot,.cursor-ring{display:none;}}
 
 /* ============================================
    BOOT / LOADER
@@ -382,9 +374,21 @@ h1.hero-name .accent{color:var(--teal);}
   background:linear-gradient(0deg,rgba(10,12,16,0.55),transparent 55%);
   opacity:0;transition:opacity 0.3s ease;z-index:3;pointer-events:none;
 }
-.pf-card:hover .pf-thumb-play{opacity:1;}
+.pf-thumb-play{opacity:1;}
 .pf-card.video-active .pf-thumb-play{opacity:0;}
 .pf-thumb-play span{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.94);color:#0a0c10;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.pf-thumb-loading{
+  position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(10,12,16,0.5);z-index:6;
+}
+.pf-card.loading .pf-thumb-loading{display:flex;}
+.pf-card.loading .pf-thumb-play{opacity:0;}
+.pf-spinner{
+  width:34px;height:34px;border-radius:50%;
+  border:3px solid rgba(255,255,255,0.25);border-top-color:var(--teal);
+  animation:pf-spin 0.8s linear infinite;
+}
+@keyframes pf-spin{to{transform:rotate(360deg);}}
 .pf-cat-tag{position:absolute;top:12px;left:12px;font-family:var(--font-mono);font-size:10.5px;color:var(--text);background:rgba(10,12,16,0.65);border:1px solid var(--border);padding:5px 10px;border-radius:100px;backdrop-filter:blur(6px);z-index:4;}
 [data-theme="light"] .pf-cat-tag{color:#f3f1ea;}
 .pf-orient-tag{position:absolute;top:12px;right:12px;font-family:var(--font-mono);font-size:10px;color:var(--text-faint);background:rgba(10,12,16,0.65);border:1px solid var(--border);padding:5px 9px;border-radius:100px;backdrop-filter:blur(6px);z-index:4;}
@@ -393,6 +397,12 @@ h1.hero-name .accent{color:var(--teal);}
 .pf-title{font-family:var(--font-display);font-size:16px;font-weight:600;margin-bottom:4px;}
 .pf-meta{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);}
 .pf-card.hidden{display:none;}
+
+.portfolio-more-wrap{display:none;justify-content:center;margin-top:44px;}
+.portfolio-more-wrap.show{display:flex;}
+.pf-more-btn{gap:10px;}
+.pf-more-btn .pf-more-arrow{transition:transform 0.25s ease;}
+.pf-more-btn:hover .pf-more-arrow{transform:translateX(4px);}
 
 /* ============================================
    FEATURED / PROCESS
@@ -475,9 +485,48 @@ h1.hero-name .accent{color:var(--teal);}
 .brand-card:hover .brand-name{color:var(--text);font-weight:700;}
 
 /* ============================================
+   CERTIFICATES / LICENSES
+   ============================================ */
+.cert-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+@media (max-width:960px){.cert-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:640px){.cert-grid{grid-template-columns:1fr;}}
+.cert-card{
+  border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-m);
+  overflow:hidden;transition:transform 0.3s ease,border-color 0.3s ease,background-color 0.3s ease;
+}
+.cert-card:hover{transform:translateY(-6px);border-color:var(--border-strong);}
+.cert-thumb{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--bg-elev);}
+.cert-thumb img,
+.cert-thumb canvas.cert-pdf-canvas{width:100%;height:100%;object-fit:cover;object-position:top;transition:transform 0.5s ease;position:absolute;inset:0;}
+.cert-card:hover .cert-thumb img,
+.cert-card:hover .cert-thumb canvas.cert-pdf-canvas{transform:scale(1.04);}
+.cert-thumb-fallback{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:10px;background:var(--bg-elev);color:var(--text-faint);
+  font-family:var(--font-mono);font-size:11px;text-align:center;padding:20px;
+  transition:opacity 0.3s ease;
+}
+.cert-thumb-fallback .cert-icon{font-size:30px;}
+.cert-thumb-fallback.is-loading .cert-spinner{
+  width:22px;height:22px;border-radius:50%;
+  border:2.5px solid rgba(154,161,173,0.3);border-top-color:var(--teal);
+  animation:pf-spin 0.8s linear infinite;
+}
+.cert-badge{position:absolute;top:12px;left:12px;font-family:var(--font-mono);font-size:10.5px;color:var(--text);background:rgba(10,12,16,0.65);border:1px solid var(--border);padding:5px 10px;border-radius:100px;backdrop-filter:blur(6px);z-index:2;}
+[data-theme="light"] .cert-badge{color:#f3f1ea;}
+.cert-pdf-tag{position:absolute;top:12px;right:12px;font-family:var(--font-mono);font-size:10px;color:var(--text-faint);background:rgba(10,12,16,0.65);border:1px solid var(--border);padding:5px 9px;border-radius:100px;backdrop-filter:blur(6px);z-index:2;}
+[data-theme="light"] .cert-pdf-tag{color:#c7ccd4;}
+.cert-body{padding:18px 20px 22px;display:flex;flex-direction:column;gap:8px;}
+.cert-title{font-family:var(--font-display);font-size:16px;font-weight:600;}
+.cert-issuer{font-size:13px;color:var(--text-muted);}
+.cert-meta{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);}
+.cert-link{margin-top:6px;font-size:13px;color:var(--teal);display:inline-flex;align-items:center;gap:6px;transition:gap 0.2s ease;}
+.cert-link:hover{gap:10px;}
+
+/* ============================================
    SOCIAL
    ============================================ */
-.social-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;}
+.social-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
 @media (max-width:960px){.social-grid{grid-template-columns:repeat(2,1fr);}}
 @media (max-width:560px){.social-grid{grid-template-columns:1fr;}}
 .social-card{
@@ -540,8 +589,6 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
 <canvas id="bg-canvas"></canvas>
 <svg id="bg-grain" width="0" height="0"></svg>
 <div class="spotlight" id="spotlight"></div>
-<div class="cursor-ring" id="cursor-ring"></div>
-<div class="cursor-dot" id="cursor-dot"></div>
 
 <div id="scrubbar"><div id="scrubbar-fill"></div></div>
 <div id="scrub-readout"><span class="dot"></span><span id="scrub-time">00:00</span> / 03:10</div>
@@ -554,6 +601,7 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
       <a href="#portfolio">Portfolio</a>
       <a href="#featured">Projects</a>
       <a href="#clients">Clients</a>
+      <a href="#certificates">Certificates</a>
       <a href="#social">Social</a>
       <a href="#contact">Contact</a>
     </div>
@@ -573,6 +621,7 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
   <a href="#portfolio">Portfolio</a>
   <a href="#featured">Projects</a>
   <a href="#clients">Clients</a>
+  <a href="#certificates">Certificates</a>
   <a href="#social">Social</a>
   <a href="#contact">Contact</a>
   <a href="cv.pdf" class="nav-cv">View CV</a>
@@ -650,14 +699,18 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
     <h2 class="section-title">Selected work</h2>
     <p class="section-sub">Filter by category to explore the craft behind each frame.</p>
     <div class="filters" id="filters">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="animation">Animation</button>
+      <button class="filter-btn active" data-filter="animation">Animation</button>
       <button class="filter-btn" data-filter="story">Story</button>
       <button class="filter-btn" data-filter="animation-commercial">Animation Commercial</button>
       <button class="filter-btn" data-filter="realistic-commercial">Realistic Commercial</button>
       <button class="filter-btn" data-filter="asmr">Asmr</button>
     </div>
     <div class="portfolio-grid" id="portfolio-grid"></div>
+    <div class="portfolio-more-wrap" id="portfolio-more-wrap">
+      <a href="#" class="btn btn-outline pf-more-btn" id="pf-more-btn" target="_blank" rel="noopener">
+        <span id="pf-more-label">See more</span> <span class="pf-more-arrow">→</span>
+      </a>
+    </div>
   </div>
 </section>
 
@@ -708,6 +761,16 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
   </div>
 </section>
 
+<!-- ============ CERTIFICATES / LICENSES ============ -->
+<section id="certificates">
+  <div class="wrap">
+    <div class="eyebrow"><span class="tc">02:22</span> CERTIFICATES &amp; LICENSES</div>
+    <h2 class="section-title">Credentials that back the work</h2>
+    <p class="section-sub">Courses, trainings, and licenses completed along the way — click any card to view or verify.</p>
+    <div class="cert-grid" id="cert-grid"></div>
+  </div>
+</section>
+
 <!-- ============ SOCIAL ============ -->
 <section id="social">
   <div class="wrap">
@@ -739,14 +802,6 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
         </div>
         <div class="social-visit">Visit Profile →</div>
       </a>
-      <a class="social-card reveal" href="https://www.linkedin.com/in/devi-duwi-susanti-99aa3b2a9/" target="_blank">
-        <div class="social-top"><div class="social-icon" data-platform="linkedin">LI</div><div class="social-handle">Devi Duwi Susanti</div></div>
-        <div class="social-stats">
-          <div><strong>0++</strong><span>FOLLOWERS</span></div>
-          <div><strong>0++</strong><span>POSTS</span></div>
-        </div>
-        <div class="social-visit">Visit Profile →</div>
-      </a>
     </div>
   </div>
 </section>
@@ -758,7 +813,8 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
     <h2 class="contact-title">Let's create amazing <span class="accent">AI content</span> together.</h2>
     <div class="contact-ctas">
       <a href="https://wa.me/6285725053943" class="btn btn-primary" target="_blank">💬 WhatsApp</a>
-      <a href="mailto:duwidevi657@gmail.com" class="btn btn-outline" target="_blank">✉ Email</a>
+      <a href="mailto:memorabellia@gmail.com" class="btn btn-outline" target="_blank">✉ Email</a>
+      <a href="https://www.linkedin.com/in/devi-duwi-susanti-99aa3b2a9/" class="btn btn-outline" target="_blank">in LinkedIn</a>
       <a href="cv.pdf" class="btn btn-ghost" target="_blank">📄 View CV</a>
     </div>
   </div>
@@ -775,6 +831,7 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
       <a href="#portfolio">Portfolio</a>
       <a href="#featured">Projects</a>
       <a href="#clients">Clients</a>
+      <a href="#certificates">Certificates</a>
       <a href="#social">Social</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -782,8 +839,7 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
       <a href="https://www.tiktok.com/@memorabellia_" target="_blank">TikTok</a>
       <a href="https://www.instagram.com/memorabellia_/" target="_blank">Instagram</a>
       <a href="https://www.youtube.com/@Memorabelia" target="_blank">YouTube</a>
-      <a href="https://www.linkedin.com/in/username" target="_blank">LinkedIn</a>
-      <a href="mailto:heruvia94@gmail.com">heruvia94@gmail.com</a>
+      <a href="mailto:duwidevi657@gmail.com">duwidevi657@gmail.com</a>
     </div>
   </div>
 </footer>
@@ -894,6 +950,24 @@ const VIDEO_CONFIG = {
   }
 };
 
+/* ===========================================================
+   ⭐ SEE MORE LINKS — tombol "See more" muncul di BAWAH grid
+   portfolio (di tengah), tapi hanya untuk filter Animation,
+   Animation Commercial, dan Asmr. Ganti "#" di bawah dengan link
+   tujuan asli (misalnya link playlist YouTube, folder Drive, dsb)
+   untuk masing-masing kategori.
+   =========================================================== */
+const SEE_MORE_LINKS = {
+  "animation": "https://www.instagram.com/memorabellia_/",              // <- ganti "#" dengan link asli untuk Animation
+  "animation-commercial": "https://www.instagram.com/memorabellia_/",   // <- ganti "#" dengan link asli untuk Animation Commercial
+  "asmr": "https://www.instagram.com/hevialala_asmr/",                   // <- ganti "#" dengan link asli untuk Asmr
+};
+const SEE_MORE_LABELS = {
+  "animation": "See more Animation",
+  "animation-commercial": "See more Animation Commercial",
+  "asmr": "See more Asmr",
+};
+
 /* Detect whether a link is YouTube, Instagram, or a direct video file/URL */
 function detectMediaKind(url){
   if(!url) return null;
@@ -986,6 +1060,30 @@ const BRANDS_CONFIG = [
   { name: "Safiya", logo: "assets/brands/safiya.png" },
 ];
 
+/* ===========================================================
+   ⭐ CERTIFICATES / LICENSES CONFIG — taruh semua sertifikat atau
+   lisensi kamu di sini. Field:
+     - title: nama sertifikat/kursus
+     - issuer: penerbit (misal "Dicoding", "Google", "Coursera")
+     - date: tanggal/tahun terbit
+     - file: path/link ke file sertifikat kamu — boleh PDF (.pdf) atau
+       gambar (.jpg/.png). Kalau PDF, halaman pertamanya otomatis
+       di-render jadi gambar preview (pakai PDF.js), jadi kamu tidak
+       perlu screenshot manual. Kosongkan "" kalau belum ada file,
+       otomatis fallback ke kartu ikon polos, tanpa broken image/error.
+     - url: link untuk lihat/verifikasi sertifikat (kosongkan "" kalau
+       belum ada — otomatis dipakai file PDF-nya sendiri sebagai link
+       "View certificate", supaya klik kartu langsung buka PDF-nya)
+   Tinggal tambah/hapus/edit baris di array ini untuk update daftar,
+   tidak perlu ubah bagian HTML atau CSS manapun.
+   =========================================================== */
+const CERTIFICATES_CONFIG = [
+  { title: "Data Science Fundamentals", issuer: "DQLab", date: "2024", file: "assets/sertifikat/dqlab.pdf", url: "" },
+  { title: "Web Programming Intern", issuer: "Diskominfo", date: "2025", file: "assets/sertifikat/magang.pdf", url: "" },
+  { title: "Novo Club Leadership Bootcamp", issuer: "ParagonCorp", date: "2024", file: "assets/sertifikat/novo_1.pdf", url: "" },
+  { title: "Novo Club Certificate of Completion", issuer: "ParagonCorp", date: "2024", file: "assets/sertifikat/novo_2.pdf", url: "" },
+];
+
 /* Total project count = jumlah item di array "projects" (dihitung otomatis di bawah,
    setelah array projects didefinisikan) supaya angkanya selalu sinkron dengan portfolio. */
 
@@ -1008,33 +1106,17 @@ window.addEventListener('load', ()=>{
 });
 
 /* ===========================================================
-   CUSTOM CURSOR + SPOTLIGHT
+   SPOTLIGHT (ambient glow that follows the pointer — normal
+   system cursor is used everywhere, no custom cursor overlay)
    =========================================================== */
-const cursorDot = document.getElementById('cursor-dot');
-const cursorRing = document.getElementById('cursor-ring');
 const spotlight = document.getElementById('spotlight');
 let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
-let ringX = mouseX, ringY = mouseY;
 const isTouch = window.matchMedia('(hover:none),(pointer:coarse)').matches;
 
 window.addEventListener('mousemove', (e)=>{
   mouseX = e.clientX; mouseY = e.clientY;
-  cursorDot.style.transform = `translate(${mouseX}px,${mouseY}px) translate(-50%,-50%)`;
   spotlight.style.setProperty('--mx', mouseX + 'px');
   spotlight.style.setProperty('--my', mouseY + 'px');
-});
-
-function animateRing(){
-  ringX += (mouseX - ringX) * 0.16;
-  ringY += (mouseY - ringY) * 0.16;
-  cursorRing.style.transform = `translate(${ringX}px,${ringY}px) translate(-50%,-50%)`;
-  requestAnimationFrame(animateRing);
-}
-if(!isTouch) animateRing();
-
-document.querySelectorAll('a,button,.pf-card,.social-card').forEach(el=>{
-  el.addEventListener('mouseenter', ()=> cursorRing.classList.add('hover'));
-  el.addEventListener('mouseleave', ()=> cursorRing.classList.remove('hover'));
 });
 
 /* ===========================================================
@@ -1156,6 +1238,7 @@ projects.forEach((p,i)=>{
       <span class="pf-cat-tag">${p.label}</span>
       <span class="pf-orient-tag">${isPortrait ? '9:16' : '16:9'}</span>
       <div class="pf-thumb-play"><span>▶</span></div>
+      <div class="pf-thumb-loading"><div class="pf-spinner"></div></div>
     </div>
     <div class="pf-body">
       <div class="pf-title">${p.title}</div>
@@ -1164,10 +1247,49 @@ projects.forEach((p,i)=>{
   grid.appendChild(card);
 });
 
-/* Preview video/embed: lazy-load on hover (desktop) or tap (mobile).
+/* "See more" button below the portfolio grid — only shown for the
+   Animation, Animation Commercial, and Asmr filters, linking out to
+   whatever URL is set in SEE_MORE_LINKS above. Hidden automatically
+   for "All" and any category not listed there. */
+const portfolioMoreWrap = document.getElementById('portfolio-more-wrap');
+const pfMoreBtn = document.getElementById('pf-more-btn');
+const pfMoreLabel = document.getElementById('pf-more-label');
+
+function updateSeeMore(filter){
+  const isEligible = Object.prototype.hasOwnProperty.call(SEE_MORE_LINKS, filter);
+  if(isEligible){
+    pfMoreBtn.href = SEE_MORE_LINKS[filter] || '#';
+    pfMoreLabel.textContent = SEE_MORE_LABELS[filter] || 'See more';
+    portfolioMoreWrap.classList.add('show');
+  } else {
+    portfolioMoreWrap.classList.remove('show');
+  }
+}
+
+/* No more "All" filter button — the grid starts filtered to whichever
+   button has the "active" class in the HTML (Animation by default). */
+const DEFAULT_FILTER = document.querySelector('.filter-btn.active')?.dataset.filter || 'animation';
+document.querySelectorAll('.pf-card').forEach(card=>{
+  const show = card.dataset.cat === DEFAULT_FILTER;
+  card.classList.toggle('hidden', !show);
+});
+updateSeeMore(DEFAULT_FILTER);
+
+/* Preview video/embed: click a card once to play it, click it again to
+   pause it, click a different card to auto-stop whichever one was
+   playing and start the new one. While a video/embed is still loading,
+   a spinner shows on top of the thumbnail so the user isn't left
+   wondering whether their click registered.
    Supports direct video files/links, YouTube links, and Instagram links.
    Gracefully falls back to the generative canvas thumbnail if nothing
    valid is set yet. */
+function setCardLoading(card, isLoading){
+  card.classList.toggle('loading', isLoading);
+}
+function clearLoadingTimeout(card){
+  if(card._loadingTimeout){ clearTimeout(card._loadingTimeout); card._loadingTimeout = null; }
+}
+
 function activateCardVideo(card){
   const thumb = card.querySelector('.pf-thumb');
   const video = card.querySelector('.pf-video');
@@ -1175,11 +1297,29 @@ function activateCardVideo(card){
   const kind = detectMediaKind(url);
   if(!url || !kind) return;
 
+  setCardLoading(card, true);
+  clearLoadingTimeout(card);
+  // Safety net: even if the 'playing'/'load' event never fires (slow
+  // network, a replay edge case, etc.) the spinner still clears itself
+  // after a few seconds instead of getting stuck forever.
+  card._loadingTimeout = setTimeout(()=> setCardLoading(card, false), 6000);
+
   if(kind === 'direct'){
     if(!video.src) video.src = url;
+    // Re-attach a fresh listener every time this card is played, so
+    // replaying a video that was already watched before still clears
+    // the loading state correctly.
+    if(video._onPlaying) video.removeEventListener('playing', video._onPlaying);
+    video._onPlaying = ()=>{ setCardLoading(card, false); clearLoadingTimeout(card); };
+    video.addEventListener('playing', video._onPlaying, {once:true});
     video.play().then(()=>{
       card.classList.add('video-active');
-    }).catch(()=>{ /* no valid link/file yet — canvas stays visible */ });
+    }).catch(()=>{
+      // no valid link/file yet — canvas stays visible
+      setCardLoading(card, false);
+      clearLoadingTimeout(card);
+      card.classList.remove('video-active');
+    });
     return;
   }
 
@@ -1191,14 +1331,18 @@ function activateCardVideo(card){
     iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
     thumb.appendChild(iframe);
   }
+  if(iframe._onLoad) iframe.removeEventListener('load', iframe._onLoad);
+  iframe._onLoad = ()=>{ setCardLoading(card, false); clearLoadingTimeout(card); };
+  iframe.addEventListener('load', iframe._onLoad, {once:true});
+
   if(kind === 'youtube'){
     const id = extractYouTubeId(url);
-    if(!id) return;
+    if(!id){ setCardLoading(card, false); clearLoadingTimeout(card); return; }
     iframe.src = buildYouTubeEmbedUrl(id, {autoplay:true});
     card.classList.add('video-active');
   } else if(kind === 'instagram'){
     const embedSrc = extractInstagramEmbedSrc(url);
-    if(!embedSrc) return;
+    if(!embedSrc){ setCardLoading(card, false); clearLoadingTimeout(card); return; }
     iframe.src = embedSrc;
     card.classList.add('video-active');
   }
@@ -1207,19 +1351,27 @@ function deactivateCardVideo(card){
   const thumb = card.querySelector('.pf-thumb');
   const video = card.querySelector('.pf-video');
   card.classList.remove('video-active');
+  setCardLoading(card, false);
+  clearLoadingTimeout(card);
   if(video) video.pause();
   const iframe = thumb.querySelector('iframe.pf-embed');
-  if(iframe) iframe.src = ''; // stop playback / unload
+  if(iframe) iframe.src = ''; // stop playback / unload so it re-loads fresh next time it's played
 }
 document.querySelectorAll('.pf-card').forEach(card=>{
-  card.addEventListener('mouseenter', ()=> activateCardVideo(card));
-  card.addEventListener('mouseleave', ()=> deactivateCardVideo(card));
-  // touch devices: tap once to play preview, tap again elsewhere to stop
-  card.addEventListener('touchstart', ()=>{
-    const isActive = card.classList.contains('video-active');
-    document.querySelectorAll('.pf-card.video-active').forEach(c=> deactivateCardVideo(c));
-    if(!isActive) activateCardVideo(card);
-  }, {passive:true});
+  card.addEventListener('click', (e)=>{
+    e.preventDefault();
+    const wasActive = card.classList.contains('video-active');
+    // clicking any card auto-stops whichever other video was playing
+    document.querySelectorAll('.pf-card.video-active, .pf-card.loading').forEach(c=>{
+      if(c !== card) deactivateCardVideo(c);
+    });
+    // clicking the same card again pauses it; otherwise start it
+    if(wasActive){
+      deactivateCardVideo(card);
+    } else {
+      activateCardVideo(card);
+    }
+  });
 });
 
 /* Filter logic */
@@ -1230,9 +1382,13 @@ filterBtns.forEach(btn=>{
     btn.classList.add('active');
     const f = btn.dataset.filter;
     document.querySelectorAll('.pf-card').forEach(card=>{
-      const show = f === 'all' || card.dataset.cat === f;
+      const show = card.dataset.cat === f;
       card.classList.toggle('hidden', !show);
+      if(!show && (card.classList.contains('video-active') || card.classList.contains('loading'))){
+        deactivateCardVideo(card);
+      }
     });
+    updateSeeMore(f);
   });
 });
 
@@ -1312,6 +1468,128 @@ featured.forEach(f=>{
     return card;
   }
   BRANDS_CONFIG.forEach(b => marquee.appendChild(buildBrandCard(b)));
+})();
+
+/* ===========================================================
+   RENDER CERTIFICATES / LICENSES GRID
+   Supports both PDF files (page 1 auto-rendered as the preview via
+   PDF.js) and plain image files (.jpg/.png) — detected automatically
+   from the file extension. Falls back to a plain icon card if the
+   file is empty, still missing, or fails to load/render.
+   =========================================================== */
+(function(){
+  const certGrid = document.getElementById('cert-grid');
+  if(!certGrid) return;
+
+  // Point PDF.js at its worker script (same version as the <script> tag
+  // loaded in <head>) so PDF rendering runs off the main thread.
+  if(window.pdfjsLib){
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+
+  function isPdfFile(src){ return /\.pdf(\?|#|$)/i.test(src || ''); }
+
+  // Renders page 1 of a PDF onto a <canvas> sized to the thumbnail box.
+  function renderPdfThumb(cert, thumb, fallback){
+    if(!window.pdfjsLib){ return; } // library failed to load -> icon fallback stays
+    fallback.classList.add('is-loading');
+    fallback.innerHTML = '<span class="cert-spinner"></span><span>Loading preview…</span>';
+
+    pdfjsLib.getDocument(cert.file).promise
+      .then(pdf => pdf.getPage(1))
+      .then(page => {
+        const targetWidth = thumb.clientWidth || 400;
+        const baseViewport = page.getViewport({ scale: 1 });
+        const scale = (targetWidth * 2) / baseViewport.width; // 2x for crisp preview
+        const viewport = page.getViewport({ scale });
+
+        const canvas = document.createElement('canvas');
+        canvas.className = 'cert-pdf-canvas';
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext('2d');
+
+        return page.render({ canvasContext: ctx, viewport }).promise.then(() => canvas);
+      })
+      .then(canvas => {
+        thumb.insertBefore(canvas, thumb.firstChild);
+        fallback.style.display = 'none';
+      })
+      .catch(()=>{
+        // PDF missing / failed to load or render -> keep a clean icon fallback
+        fallback.classList.remove('is-loading');
+        fallback.innerHTML = `<span class="cert-icon">🎓</span><span>${cert.title}</span>`;
+      });
+  }
+
+  // Loads a plain image (.jpg/.png/etc) the same safe way the rest of
+  // the site does — swap in only once it's confirmed to load.
+  function renderImageThumb(cert, thumb, fallback){
+    const img = new Image();
+    img.onload = ()=>{
+      const realImg = document.createElement('img');
+      realImg.src = cert.file;
+      realImg.alt = cert.title;
+      realImg.loading = 'lazy';
+      thumb.insertBefore(realImg, thumb.firstChild);
+      fallback.style.display = 'none';
+    };
+    img.onerror = ()=>{ /* image belum ada / gagal load -> icon fallback tetap dipakai */ };
+    img.src = cert.file;
+  }
+
+  function buildCertCard(cert){
+    // Backward-compatible: older configs may still use "image" instead of "file".
+    const fileSrc = cert.file || cert.image || '';
+    const pdf = isPdfFile(fileSrc);
+    // If no explicit verification url is set, fall back to the PDF file
+    // itself so "View certificate" / clicking the card still opens it.
+    const linkUrl = cert.url || (pdf ? fileSrc : '');
+
+    const card = document.createElement('div');
+    card.className = 'cert-card reveal';
+
+    const linkHtml = linkUrl
+      ? `<a class="cert-link" href="${linkUrl}" target="_blank" rel="noopener">View certificate →</a>`
+      : '';
+
+    card.innerHTML = `
+      <div class="cert-thumb">
+        <div class="cert-thumb-fallback">
+          <span class="cert-icon">🎓</span>
+          <span>${cert.title}</span>
+        </div>
+        <span class="cert-badge">${cert.issuer}</span>
+        ${pdf ? '<span class="cert-pdf-tag">PDF</span>' : ''}
+      </div>
+      <div class="cert-body">
+        <div class="cert-title">${cert.title}</div>
+        <div class="cert-issuer">${cert.issuer}</div>
+        <div class="cert-meta">Issued ${cert.date}</div>
+        ${linkHtml}
+      </div>`;
+
+    if(fileSrc){
+      const thumb = card.querySelector('.cert-thumb');
+      const fallback = card.querySelector('.cert-thumb-fallback');
+      if(pdf) renderPdfThumb({ ...cert, file: fileSrc }, thumb, fallback);
+      else renderImageThumb({ ...cert, file: fileSrc }, thumb, fallback);
+    }
+
+    // Whole card opens the certificate link (if any) when clicked, not
+    // just the small "View certificate" text.
+    if(linkUrl){
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', (e)=>{
+        if(e.target.closest('a')) return; // let the inner link handle its own click
+        window.open(linkUrl, '_blank', 'noopener');
+      });
+    }
+
+    return card;
+  }
+
+  CERTIFICATES_CONFIG.forEach(cert => certGrid.appendChild(buildCertCard(cert)));
 })();
 
 /* ===========================================================
@@ -1681,23 +1959,6 @@ document.querySelectorAll('.pf-thumb canvas').forEach(canvas=>{
   if(!reduceMotion) draw(); else { t=0; draw(); }
 })();
 
-/* Make portfolio thumbnails feel like looping preview clips on hover, and cycle one "now playing" automatically */
-(function(){
-  const cards = document.querySelectorAll('.pf-card');
-  if(!cards.length) return;
-  let idx = 0;
-  function cyclePlay(){
-    cards.forEach(c=>c.classList.remove('playing'));
-    const visible = Array.from(cards).filter(c=>!c.classList.contains('hidden'));
-    if(visible.length){
-      idx = idx % visible.length;
-      visible[idx].classList.add('playing');
-      idx++;
-    }
-  }
-  cyclePlay();
-  setInterval(cyclePlay, 2600);
-})();
 </script>
 </body>
 </html>
