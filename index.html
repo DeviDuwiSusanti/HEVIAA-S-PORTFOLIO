@@ -267,6 +267,19 @@ h1.hero-name .accent{color:var(--teal);}
 .hero-meta{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:38px;font-size:13.5px;color:var(--text-faint);}
 .hero-meta span{display:flex;align-items:center;gap:6px;}
 
+.hero-skills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:30px;}
+.hero-skill-pill{
+  font-family:var(--font-mono);font-size:11.5px;color:var(--text-muted);
+  border:1px solid var(--border);padding:7px 13px;border-radius:100px;
+  display:flex;align-items:center;gap:7px;background:var(--surface);
+  transition:border-color 0.2s ease,color 0.2s ease,transform 0.2s ease;
+}
+.hero-skill-pill:hover{border-color:var(--teal);color:var(--text);transform:translateY(-2px);}
+.hero-skill-pill .sk-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);}
+.hero-skill-pill:nth-child(2) .sk-dot{background:var(--coral);}
+.hero-skill-pill:nth-child(3) .sk-dot{background:var(--teal);}
+.hero-skill-pill:nth-child(4) .sk-dot{background:var(--coral);}
+
 .hero-ctas{display:flex;flex-wrap:wrap;gap:12px;}
 .btn{
   display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:500;
@@ -403,6 +416,16 @@ h1.hero-name .accent{color:var(--teal);}
 .pf-more-btn{gap:10px;}
 .pf-more-btn .pf-more-arrow{transition:transform 0.25s ease;}
 .pf-more-btn:hover .pf-more-arrow{transform:translateX(4px);}
+
+/* Design (product design) card image counter badge */
+.pf-img-count{
+  position:absolute;bottom:12px;right:12px;z-index:4;
+  font-family:var(--font-mono);font-size:10.5px;color:var(--text);
+  background:rgba(10,12,16,0.65);border:1px solid var(--border);
+  padding:5px 9px;border-radius:100px;backdrop-filter:blur(6px);
+  display:flex;align-items:center;gap:5px;
+}
+[data-theme="light"] .pf-img-count{color:#f3f1ea;}
 
 /* ============================================
    FEATURED / PROCESS
@@ -576,6 +599,80 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
 .reveal{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease,transform 0.7s ease;}
 .reveal.in{opacity:1;transform:translateY(0);}
 
+/* ============================================
+   PROJECT MODAL (lightbox for portfolio + ads)
+   ============================================ */
+.project-modal{
+  position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;
+  padding:24px;
+}
+.project-modal.open{display:flex;}
+.project-modal-backdrop{
+  position:absolute;inset:0;background:rgba(6,7,10,0.88);backdrop-filter:blur(6px);
+}
+.project-modal-inner{
+  position:relative;z-index:1;width:100%;max-width:960px;max-height:92vh;
+  background:var(--bg-elev);border:1px solid var(--border-strong);border-radius:var(--radius-l);
+  overflow:hidden;display:flex;flex-direction:column;
+  transform:scale(0.96);opacity:0;transition:transform 0.25s ease,opacity 0.25s ease;
+}
+.project-modal.open .project-modal-inner{transform:scale(1);opacity:1;}
+.project-modal-close{
+  position:absolute;top:14px;right:14px;z-index:5;width:38px;height:38px;border-radius:50%;
+  background:rgba(10,12,16,0.6);color:#f3f1ea;display:flex;align-items:center;justify-content:center;
+  font-size:16px;transition:background 0.2s ease,transform 0.2s ease;backdrop-filter:blur(6px);
+}
+.project-modal-close:hover{background:var(--coral);transform:rotate(90deg);}
+.project-modal-media{
+  position:relative;width:100%;background:#000;
+  aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.project-modal-media.is-portrait{aspect-ratio:9/16;max-height:70vh;margin:0 auto;}
+.project-modal-media.is-gallery{aspect-ratio:4/3;}
+.project-modal-media iframe,
+.project-modal-media video{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.project-modal-media img{width:100%;height:100%;object-fit:contain;background:#000;}
+.project-modal-loading{
+  position:absolute;inset:0;z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  background:rgba(10,12,16,0.7);
+}
+.project-modal-loading.show{display:flex;}
+.project-modal-loading .pm-spinner{
+  width:38px;height:38px;border-radius:50%;
+  border:3px solid rgba(255,255,255,0.2);border-top-color:var(--teal);
+  animation:pf-spin 0.8s linear infinite;
+}
+.project-modal-loading span{font-family:var(--font-mono);font-size:11.5px;color:rgba(243,241,234,0.75);letter-spacing:0.03em;}
+.project-modal-nav{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:4;
+  width:40px;height:40px;border-radius:50%;background:rgba(10,12,16,0.55);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:16px;backdrop-filter:blur(6px);
+  transition:background 0.2s ease;
+}
+.project-modal-nav:hover{background:var(--teal);color:#04140f;}
+.project-modal-nav.prev{left:14px;}
+.project-modal-nav.next{right:14px;}
+.project-modal-dots{
+  position:absolute;bottom:14px;left:0;right:0;z-index:4;
+  display:flex;justify-content:center;gap:6px;
+}
+.project-modal-dots .md-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.4);transition:background 0.2s ease,width 0.2s ease;}
+.project-modal-dots .md-dot.active{background:var(--teal);width:16px;border-radius:4px;}
+.project-modal-info{padding:20px 26px 26px;}
+.project-modal-info h3{font-size:19px;margin-bottom:6px;}
+.project-modal-info p{font-size:13.5px;color:var(--text-muted);max-width:640px;}
+.project-modal-tag{
+  display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;
+  color:var(--teal);background:var(--teal-dim);border:1px solid rgba(69,224,196,0.3);
+  padding:5px 11px;border-radius:100px;margin-bottom:10px;
+}
+body.modal-lock{overflow:hidden;}
+@media (max-width:640px){
+  .project-modal{padding:0;}
+  .project-modal-inner{max-height:100vh;height:100%;border-radius:0;}
+  .project-modal-media{aspect-ratio:auto;flex:1;}
+}
+
 </style>
 </head>
 <body>
@@ -631,6 +728,25 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
   </button>
 </div>
 
+<!-- ============ PROJECT MODAL (lightbox) ============ -->
+<div class="project-modal" id="project-modal">
+  <div class="project-modal-backdrop" id="project-modal-backdrop"></div>
+  <div class="project-modal-inner">
+    <button class="project-modal-close" id="project-modal-close" aria-label="Close">✕</button>
+    <div class="project-modal-media" id="project-modal-media">
+      <div class="project-modal-loading" id="project-modal-loading"><div class="pm-spinner"></div><span>Loading…</span></div>
+      <button class="project-modal-nav prev" id="project-modal-prev" aria-label="Previous">‹</button>
+      <button class="project-modal-nav next" id="project-modal-next" aria-label="Next">›</button>
+      <div class="project-modal-dots" id="project-modal-dots"></div>
+    </div>
+    <div class="project-modal-info">
+      <span class="project-modal-tag" id="project-modal-tag">Project</span>
+      <h3 id="project-modal-title">Title</h3>
+      <p id="project-modal-desc"></p>
+    </div>
+  </div>
+</div>
+
 <!-- ============ HERO ============ -->
 <section id="hero">
   <div class="wrap hero-grid">
@@ -639,10 +755,16 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
       <p class="hero-hi">Hi, I'm</p>
       <h1 class="hero-name">Devi Duwi Susanti / Heviaa <span class="accent">👋</span></h1>
       <p class="hero-role" id="hero-role-text">AI CONTENT CREATOR</p>
-      <p class="hero-desc">I specialize in AI Content Creation, Data Processing & Analysis, Digital Content, and AI-powered solutions. With a background in Informatics Engineering, I combine AI tools, data analysis, creative storytelling, and technical skills to create engaging content, process and analyze data, and develop practical digital solutions. I am adaptable and passionate about using technology to solve problems and deliver meaningful results.</p>
+      <p class="hero-desc">I specialize in AI Content Creation, Product Design, Commercial &amp; Product Advertising, Data Processing &amp; Analysis, Digital Content, and AI-powered solutions. With a background in Informatics Engineering, I combine AI tools, product design, creative storytelling, and technical skills to create engaging content, design compelling product visuals, process and analyze data, and develop practical digital solutions. I am adaptable and passionate about using technology to solve problems and deliver meaningful results.</p>
       <div class="hero-meta">
         <span>📍 Surabaya, Indonesia</span>
         <span>🎬 40+ projects delivered</span>
+      </div>
+      <div class="hero-skills">
+        <span class="hero-skill-pill"><span class="sk-dot"></span>AI Content Creation</span>
+        <span class="hero-skill-pill"><span class="sk-dot"></span>Product Design</span>
+        <span class="hero-skill-pill"><span class="sk-dot"></span>Commercial &amp; Product Ads</span>
+        <span class="hero-skill-pill"><span class="sk-dot"></span>Data Processing &amp; Analysis</span>
       </div>
       <div class="hero-ctas">
         <a href="#showreel" class="btn btn-primary">▶ Watch Showreel</a>
@@ -699,10 +821,12 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
     <h2 class="section-title">Selected work</h2>
     <p class="section-sub">Filter by category to explore the craft behind each frame.</p>
     <div class="filters" id="filters">
+      <button class="filter-btn" data-filter="product-design">Product Design</button>
+      <button class="filter-btn" data-filter="poster">Poster</button>
+      <button class="filter-btn" data-filter="realistic-commercial">Realistic Commercial</button>
+      <button class="filter-btn" data-filter="animation-commercial">Animation Commercial</button>
       <button class="filter-btn active" data-filter="animation">Animation</button>
       <button class="filter-btn" data-filter="story">Story</button>
-      <button class="filter-btn" data-filter="animation-commercial">Animation Commercial</button>
-      <button class="filter-btn" data-filter="realistic-commercial">Realistic Commercial</button>
       <button class="filter-btn" data-filter="asmr">Asmr</button>
     </div>
     <div class="portfolio-grid" id="portfolio-grid"></div>
@@ -947,8 +1071,52 @@ const VIDEO_CONFIG = {
     "garden-harvest":"https://youtube.com/shorts/CNU3fCcALEA?si=xgQKEBav20WBriDn",
     "supermarket":"https://youtube.com/shorts/uSrjwdkSRhg?si=fCCVY28eOvl4ddD-",
     "grace":"https://youtube.com/shorts/bPLnEkwZmJk",
+    "soklin":"https://youtu.be/5iOBjGD5kgs"
   }
 };
+
+/* ===========================================================
+   ⭐ PRODUCT DESIGN CONFIG — taruh project product design kamu di
+   sini. Setiap project bisa punya BEBERAPA gambar (array "images")
+   yang otomatis bisa di-slide baik di thumbnail portfolio maupun di
+   modal saat dibuka. Kosongkan "images" kalau belum ada gambarnya,
+   otomatis fallback ke animasi generative canvas seperti card lain.
+   =========================================================== */
+const DESIGN_PROJECTS_CONFIG = [
+  {
+    title: "Soklin New Packaging Concept",
+    slug: "soklin",
+    year: "2026",
+    hue: 172,
+    desc: "",
+    images: [
+      "assets/product_design/soklin/thumbnail.jpeg",
+      "assets/product_design/soklin/depan.jpeg",
+      "assets/product_design/soklin/belakang.jpeg",
+      "assets/product_design/soklin/kemasan.jpeg",
+    ]
+  }
+];
+
+/* ===========================================================
+   ⭐ POSTER CONFIG — taruh project poster kamu di sini. Sama seperti
+   Product Design, setiap poster bisa punya BEBERAPA gambar (array
+   "images") yang otomatis bisa di-slide baik di thumbnail portfolio
+   maupun di modal. Kosongkan "images" kalau belum ada gambarnya,
+   otomatis fallback ke animasi generative canvas seperti card lain.
+   =========================================================== */
+const POSTERS_CONFIG = [
+  {
+    title: "Example 1",
+    slug: "poster1",
+    year: "2026",
+    hue: 14,
+    desc: "",
+    images: [
+      "assets/poster/1.jpeg"
+    ]
+  }
+];
 
 /* ===========================================================
    ⭐ SEE MORE LINKS — tombol "See more" muncul di BAWAH grid
@@ -984,7 +1152,7 @@ function extractInstagramEmbedSrc(url){
   return m ? `https://www.instagram.com/${m[1]}/${m[2]}/embed/` : null;
 }
 function buildYouTubeEmbedUrl(id, {autoplay=false}={}){
-  return `https://www.youtube.com/embed/${id}?autoplay=${autoplay?1:0}&mute=1&loop=1&playlist=${id}&controls=1&modestbranding=1&playsinline=1&rel=0`;
+  return `https://www.youtube.com/embed/${id}?autoplay=${autoplay?1:0}&mute=${autoplay?1:0}&loop=1&playlist=${id}&controls=1&modestbranding=1&playsinline=1&rel=0`;
 }
 /* Resolve the "before play" preview picture for a portfolio project:
    1. Explicit p.poster if you set one (highest priority)
@@ -1001,6 +1169,128 @@ function resolvePosterSrc(project, videoUrl){
   }
   return `assets/portfolio/posters/${project.slug}.jpg`;
 }
+
+/* ===========================================================
+   ⭐ PROJECT MODAL (lightbox) — dipakai untuk semua "play"/"view"
+   di Portfolio (video & product design) dan di Commercial Ads.
+   Mendukung 3 tipe konten:
+     - video   : embed YouTube/Instagram atau <video> langsung
+     - gallery : slideshow beberapa gambar (product design projects)
+     - image   : satu gambar tunggal (ads showcase)
+   =========================================================== */
+const projectModal = document.getElementById('project-modal');
+const projectModalMedia = document.getElementById('project-modal-media');
+const projectModalDots = document.getElementById('project-modal-dots');
+const projectModalPrev = document.getElementById('project-modal-prev');
+const projectModalNext = document.getElementById('project-modal-next');
+const projectModalClose = document.getElementById('project-modal-close');
+const projectModalBackdrop = document.getElementById('project-modal-backdrop');
+const projectModalTitle = document.getElementById('project-modal-title');
+const projectModalDesc = document.getElementById('project-modal-desc');
+const projectModalTag = document.getElementById('project-modal-tag');
+
+let modalState = { type:null, images:[], index:0 };
+
+function renderModalDots(){
+  projectModalDots.innerHTML = '';
+  if(modalState.type !== 'gallery' || modalState.images.length < 2){
+    projectModalDots.style.display = 'none';
+    projectModalPrev.style.display = 'none';
+    projectModalNext.style.display = 'none';
+    return;
+  }
+  projectModalDots.style.display = 'flex';
+  projectModalPrev.style.display = 'flex';
+  projectModalNext.style.display = 'flex';
+  modalState.images.forEach((_,i)=>{
+    const d = document.createElement('span');
+    d.className = 'md-dot' + (i === modalState.index ? ' active' : '');
+    projectModalDots.appendChild(d);
+  });
+}
+
+function renderModalMedia(){
+  // clear previous media node(s), keep the nav controls & dots container
+  Array.from(projectModalMedia.querySelectorAll('img,video,iframe')).forEach(n=>n.remove());
+  projectModalMedia.classList.remove('is-portrait','is-gallery');
+
+  if(modalState.type === 'gallery'){
+    projectModalMedia.classList.add('is-gallery');
+    const img = document.createElement('img');
+    img.src = modalState.images[modalState.index];
+    img.alt = projectModalTitle.textContent;
+    img.onerror = ()=>{ img.style.display='none'; };
+    projectModalMedia.appendChild(img);
+  } else if(modalState.type === 'image'){
+    const img = document.createElement('img');
+    img.src = modalState.images[0];
+    img.alt = projectModalTitle.textContent;
+    img.onerror = ()=>{ img.style.display='none'; };
+    projectModalMedia.appendChild(img);
+  } else if(modalState.type === 'video'){
+    if(modalState.orientation === 'portrait') projectModalMedia.classList.add('is-portrait');
+    const url = modalState.images[0];
+    const kind = detectMediaKind(url);
+    if(kind === 'youtube'){
+      const id = extractYouTubeId(url);
+      if(id){
+        const iframe = document.createElement('iframe');
+        iframe.src = buildYouTubeEmbedUrl(id, {autoplay:true});
+        iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+        iframe.allowFullscreen = true;
+        projectModalMedia.appendChild(iframe);
+      }
+    } else if(kind === 'instagram'){
+      const src = extractInstagramEmbedSrc(url);
+      if(src){
+        const iframe = document.createElement('iframe');
+        iframe.src = src;
+        iframe.allow = 'autoplay; encrypted-media';
+        projectModalMedia.appendChild(iframe);
+      }
+    } else if(kind === 'direct' && url){
+      const video = document.createElement('video');
+      video.src = url;
+      video.controls = true;
+      video.autoplay = true;
+      video.playsInline = true;
+      projectModalMedia.appendChild(video);
+    }
+  }
+  renderModalDots();
+}
+
+function openProjectModal({type, images=[], index=0, title='', desc='', tag='Project', orientation='landscape'}){
+  modalState = { type, images, index, orientation };
+  projectModalTitle.textContent = title;
+  projectModalDesc.textContent = desc;
+  projectModalTag.textContent = tag;
+  renderModalMedia();
+  projectModal.classList.add('open');
+  document.body.classList.add('modal-lock');
+}
+function closeProjectModal(){
+  projectModal.classList.remove('open');
+  document.body.classList.remove('modal-lock');
+  // stop any playing media by clearing it out
+  Array.from(projectModalMedia.querySelectorAll('img,video,iframe')).forEach(n=>n.remove());
+}
+function modalGalleryStep(dir){
+  if(modalState.type !== 'gallery') return;
+  const len = modalState.images.length;
+  modalState.index = (modalState.index + dir + len) % len;
+  renderModalMedia();
+}
+projectModalClose.addEventListener('click', closeProjectModal);
+projectModalBackdrop.addEventListener('click', closeProjectModal);
+projectModalPrev.addEventListener('click', ()=> modalGalleryStep(-1));
+projectModalNext.addEventListener('click', ()=> modalGalleryStep(1));
+document.addEventListener('keydown', (e)=>{
+  if(!projectModal.classList.contains('open')) return;
+  if(e.key === 'Escape') closeProjectModal();
+  if(e.key === 'ArrowLeft') modalGalleryStep(-1);
+  if(e.key === 'ArrowRight') modalGalleryStep(1);
+});
 
 /* ===========================================================
    ⭐ SOCIAL ICON CONFIG — taruh link/path gambar LOGO untuk tiap
@@ -1138,7 +1428,7 @@ document.querySelectorAll('.btn').forEach(btn=>{
    =========================================================== */
 (function(){
   const el = document.getElementById('hero-role-text');
-  const roles = ['DATA ANALYST', 'DATA ENTRY', 'DATA PROCESSING', 'AI CONTENT CREATOR','AI ANIMATION ARTIST','COMMERCIAL AI DESIGNER','AI FILMMAKER'];
+  const roles = ['DATA ANALYST', 'DATA ENTRY', 'DATA PROCESSING', 'AI CONTENT CREATOR','AI ANIMATION ARTIST','PRODUCT DESIGNER','COMMERCIAL AD CREATOR','COMMERCIAL AI DESIGNER','AI FILMMAKER'];
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#%&$*';
   let roleIndex = 0;
   if(reduceMotionCheck()) return;
@@ -1209,6 +1499,7 @@ const projects = [
   {title:"The Beauty of Becoming", cat:"story", label:"Story", year:"2026", hue:14, slug:"The-Beauty-of-Becoming", orientation:"landscape"},
   {title:"This Pressure is Not a Punishment.", cat:"story", label:"Story", year:"2026", hue:14, slug:"Pressure", orientation:"landscape"},
   {title:"Blueprint For the Future", cat:"story", label:"Story", year:"2026", hue:14, slug:"blueprint-for-the-future", orientation:"landscape"},
+  {title:"Soklin Commercial", cat:"realistic-commercial", label:"Commercial", year:"2026", hue:18, slug:"soklin", orientation:"landscape"}
 ];
 
 const featured = [
@@ -1218,7 +1509,7 @@ const featured = [
 ];
 
 /* ===========================================================
-   RENDER PORTFOLIO GRID
+   RENDER PORTFOLIO GRID (video-based projects)
    =========================================================== */
 const grid = document.getElementById('portfolio-grid');
 projects.forEach((p,i)=>{
@@ -1230,22 +1521,75 @@ projects.forEach((p,i)=>{
   const card = document.createElement('div');
   card.className = 'pf-card reveal' + (isPortrait ? ' pf-card--portrait' : '');
   card.dataset.cat = p.cat;
+  card.dataset.kind = 'video';
   card.innerHTML = `
     <div class="pf-thumb">
       <canvas data-hue="${p.hue}" data-seed="${i}"></canvas>
       <img class="pf-poster" src="${posterSrc}" alt="${p.title} preview" loading="lazy" onerror="this.style.display='none'">
-      <video class="pf-video" muted loop playsinline preload="none" data-src="${videoSrc}"></video>
       <span class="pf-cat-tag">${p.label}</span>
       <span class="pf-orient-tag">${isPortrait ? '9:16' : '16:9'}</span>
       <div class="pf-thumb-play"><span>▶</span></div>
-      <div class="pf-thumb-loading"><div class="pf-spinner"></div></div>
     </div>
     <div class="pf-body">
       <div class="pf-title">${p.title}</div>
       <div class="pf-meta">${p.label.toUpperCase()} · ${p.year}</div>
     </div>`;
+  card.addEventListener('click', ()=>{
+    openProjectModal({
+      type:'video',
+      images:[videoSrc],
+      title:p.title,
+      desc:`${p.label} · ${p.year}`,
+      tag:p.label,
+      orientation:p.orientation
+    });
+  });
   grid.appendChild(card);
 });
+
+/* ===========================================================
+   RENDER PORTFOLIO GRID (image-gallery projects — Product Design & Poster)
+   Each card shows the first image as a poster with a small image
+   counter. Clicking it opens the full-size modal slideshow with
+   next/prev navigation and dots, so multiple images per project
+   can be browsed comfortably. Shared between DESIGN_PROJECTS_CONFIG
+   and POSTERS_CONFIG since both work the same way.
+   =========================================================== */
+function renderGalleryCards(config, catKey, tagLabel, seedOffset){
+  config.forEach((p,i)=>{
+    const images = p.images && p.images.length ? p.images : [];
+    const card = document.createElement('div');
+    card.className = 'pf-card reveal';
+    card.dataset.cat = catKey;
+    card.dataset.kind = 'gallery';
+    const posterSrc = images[0] || '';
+    card.innerHTML = `
+      <div class="pf-thumb">
+        <canvas data-hue="${p.hue}" data-seed="${seedOffset+i}"></canvas>
+        ${posterSrc ? `<img class="pf-poster" src="${posterSrc}" alt="${p.title} preview" loading="lazy" onerror="this.style.display='none'">` : ''}
+        <span class="pf-cat-tag">${tagLabel}</span>
+        ${images.length > 1 ? `<span class="pf-img-count">🖼 1/${images.length}</span>` : ''}
+        <div class="pf-thumb-play"><span>${images.length > 1 ? '⤢' : '▶'}</span></div>
+      </div>
+      <div class="pf-body">
+        <div class="pf-title">${p.title}</div>
+        <div class="pf-meta">${tagLabel.toUpperCase()} · ${p.year}${images.length ? ' · ' + images.length + ' images' : ''}</div>
+      </div>`;
+    card.addEventListener('click', ()=>{
+      if(!images.length) return;
+      openProjectModal({
+        type:'gallery',
+        images,
+        title:p.title,
+        desc:p.desc || `${tagLabel} · ${p.year}`,
+        tag:tagLabel
+      });
+    });
+    grid.appendChild(card);
+  });
+}
+renderGalleryCards(DESIGN_PROJECTS_CONFIG, 'product-design', 'Product Design', 100);
+renderGalleryCards(POSTERS_CONFIG, 'poster', 'Poster', 300);
 
 /* "See more" button below the portfolio grid — only shown for the
    Animation, Animation Commercial, and Asmr filters, linking out to
@@ -1275,106 +1619,10 @@ document.querySelectorAll('.pf-card').forEach(card=>{
 });
 updateSeeMore(DEFAULT_FILTER);
 
-/* Preview video/embed: click a card once to play it, click it again to
-   pause it, click a different card to auto-stop whichever one was
-   playing and start the new one. While a video/embed is still loading,
-   a spinner shows on top of the thumbnail so the user isn't left
-   wondering whether their click registered.
-   Supports direct video files/links, YouTube links, and Instagram links.
-   Gracefully falls back to the generative canvas thumbnail if nothing
-   valid is set yet. */
-function setCardLoading(card, isLoading){
-  card.classList.toggle('loading', isLoading);
-}
-function clearLoadingTimeout(card){
-  if(card._loadingTimeout){ clearTimeout(card._loadingTimeout); card._loadingTimeout = null; }
-}
-
-function activateCardVideo(card){
-  const thumb = card.querySelector('.pf-thumb');
-  const video = card.querySelector('.pf-video');
-  const url = video ? video.dataset.src : null;
-  const kind = detectMediaKind(url);
-  if(!url || !kind) return;
-
-  setCardLoading(card, true);
-  clearLoadingTimeout(card);
-  // Safety net: even if the 'playing'/'load' event never fires (slow
-  // network, a replay edge case, etc.) the spinner still clears itself
-  // after a few seconds instead of getting stuck forever.
-  card._loadingTimeout = setTimeout(()=> setCardLoading(card, false), 6000);
-
-  if(kind === 'direct'){
-    if(!video.src) video.src = url;
-    // Re-attach a fresh listener every time this card is played, so
-    // replaying a video that was already watched before still clears
-    // the loading state correctly.
-    if(video._onPlaying) video.removeEventListener('playing', video._onPlaying);
-    video._onPlaying = ()=>{ setCardLoading(card, false); clearLoadingTimeout(card); };
-    video.addEventListener('playing', video._onPlaying, {once:true});
-    video.play().then(()=>{
-      card.classList.add('video-active');
-    }).catch(()=>{
-      // no valid link/file yet — canvas stays visible
-      setCardLoading(card, false);
-      clearLoadingTimeout(card);
-      card.classList.remove('video-active');
-    });
-    return;
-  }
-
-  // youtube / instagram -> build (or reuse) an iframe embed
-  let iframe = thumb.querySelector('iframe.pf-embed');
-  if(!iframe){
-    iframe = document.createElement('iframe');
-    iframe.className = 'pf-embed';
-    iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
-    thumb.appendChild(iframe);
-  }
-  if(iframe._onLoad) iframe.removeEventListener('load', iframe._onLoad);
-  iframe._onLoad = ()=>{ setCardLoading(card, false); clearLoadingTimeout(card); };
-  iframe.addEventListener('load', iframe._onLoad, {once:true});
-
-  if(kind === 'youtube'){
-    const id = extractYouTubeId(url);
-    if(!id){ setCardLoading(card, false); clearLoadingTimeout(card); return; }
-    iframe.src = buildYouTubeEmbedUrl(id, {autoplay:true});
-    card.classList.add('video-active');
-  } else if(kind === 'instagram'){
-    const embedSrc = extractInstagramEmbedSrc(url);
-    if(!embedSrc){ setCardLoading(card, false); clearLoadingTimeout(card); return; }
-    iframe.src = embedSrc;
-    card.classList.add('video-active');
-  }
-}
-function deactivateCardVideo(card){
-  const thumb = card.querySelector('.pf-thumb');
-  const video = card.querySelector('.pf-video');
-  card.classList.remove('video-active');
-  setCardLoading(card, false);
-  clearLoadingTimeout(card);
-  if(video) video.pause();
-  const iframe = thumb.querySelector('iframe.pf-embed');
-  if(iframe) iframe.src = ''; // stop playback / unload so it re-loads fresh next time it's played
-}
-document.querySelectorAll('.pf-card').forEach(card=>{
-  card.addEventListener('click', (e)=>{
-    e.preventDefault();
-    const wasActive = card.classList.contains('video-active');
-    // clicking any card auto-stops whichever other video was playing
-    document.querySelectorAll('.pf-card.video-active, .pf-card.loading').forEach(c=>{
-      if(c !== card) deactivateCardVideo(c);
-    });
-    // clicking the same card again pauses it; otherwise start it
-    if(wasActive){
-      deactivateCardVideo(card);
-    } else {
-      activateCardVideo(card);
-    }
-  });
-});
-
-/* Filter logic */
+/* Filter logic — clicking a category filter simply shows/hides cards.
+   Playing/viewing a project now always opens the modal (see the click
+   handlers attached to each card above), so there is no more inline
+   video-in-thumbnail state to manage on filter change. */
 const filterBtns = document.querySelectorAll('.filter-btn');
 filterBtns.forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -1384,9 +1632,6 @@ filterBtns.forEach(btn=>{
     document.querySelectorAll('.pf-card').forEach(card=>{
       const show = card.dataset.cat === f;
       card.classList.toggle('hidden', !show);
-      if(!show && (card.classList.contains('video-active') || card.classList.contains('loading'))){
-        deactivateCardVideo(card);
-      }
     });
     updateSeeMore(f);
   });
@@ -1860,9 +2105,9 @@ const reelViewportObserver = new IntersectionObserver((entries)=>{
 reelViewportObserver.observe(reelSection);
 
 /* ===========================================================
-   CANVAS: portfolio thumbnails (static generative gradient)
+   CANVAS: portfolio thumbnails & ads slides (static generative gradient)
    =========================================================== */
-document.querySelectorAll('.pf-thumb canvas').forEach(canvas=>{
+function renderGenerativeThumb(canvas){
   const ctx = setupCanvas(canvas);
   const hue = parseInt(canvas.dataset.hue);
   const seed = parseInt(canvas.dataset.seed);
@@ -1897,7 +2142,8 @@ document.querySelectorAll('.pf-thumb canvas').forEach(canvas=>{
     requestAnimationFrame(loop);
   }
   if(!reduceMotion) loop();
-});
+}
+document.querySelectorAll('.pf-thumb canvas, .ads-slide canvas').forEach(renderGenerativeThumb);
 
 /* ===========================================================
    GLOBAL AMBIENT BACKGROUND — moving "video signal" across whole page
