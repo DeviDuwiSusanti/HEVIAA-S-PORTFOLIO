@@ -823,6 +823,7 @@ body.modal-lock{overflow:hidden;}
     <div class="filters" id="filters">
       <button class="filter-btn" data-filter="product-design">Product Design</button>
       <button class="filter-btn" data-filter="poster">Poster</button>
+      <button class="filter-btn" data-filter="logo">Logo Design</button>
       <button class="filter-btn" data-filter="realistic-commercial">Realistic Commercial</button>
       <button class="filter-btn" data-filter="animation-commercial">Animation Commercial</button>
       <button class="filter-btn active" data-filter="animation">Animation</button>
@@ -1119,6 +1120,44 @@ const POSTERS_CONFIG = [
 ];
 
 /* ===========================================================
+   ⭐ LOGO DESIGN CONFIG — taruh project logo design kamu di sini.
+   Tampilan kartunya SAMA PERSIS dengan Product Design/Poster (pakai
+   fungsi render yang sama), bedanya array "images" di sini boleh
+   CAMPUR antara FOTO (.jpg/.png/.webp) dan VIDEO (link YouTube,
+   link Instagram, atau file .mp4 langsung) — urutannya BEBAS, video
+   boleh diselipkan di slide manapun (awal/tengah/akhir), tidak harus
+   dikelompokkan. Sistem otomatis mendeteksi tiap slide itu gambar
+   atau video satu per satu, jadi tidak perlu setting tambahan selain
+   urutan path/link-nya di array.
+
+   Contoh di bawah ini: slide 1 & 2 foto, slide 3 VIDEO proses, slide
+   4 & 5 foto lagi. Ganti/tambah/hapus baris sesuai project kamu.
+   Kosongkan "images" (jadi array kosong []) kalau project belum ada
+   isinya — otomatis fallback ke animasi generative canvas.
+   =========================================================== */
+const LOGO_PROJECTS_CONFIG = [
+  {
+    title: "VERION",
+    slug: "logo1",
+    year: "2026",
+    hue: 200,
+    desc: "",
+    images: [
+      "assets/logo/verion/logo.jpeg",           // slide 1 — foto
+      "assets/logo/verion/company.jpeg",           // slide 2 — foto           // slide 3 — VIDEO (link YouTube) diselipkan di tengah
+      "assets/logo/verion/room.jpeg",             // slide 4 — foto lagi
+      "assets/logo/verion/tas.jpeg",  
+      "assets/logo/verion/zoomtas.jpeg",   
+      "assets/logo/verion/baju.jpeg",  
+      "assets/logo/verion/parfum.jpeg",
+      "https://youtu.be/XR7w5daIvy0"              // slide 5 — foto lagi
+      // Boleh juga pakai format "https://youtube.com/shorts/xxxxxxxxxxx"
+      // Video bisa diselipkan di slide manapun, tidak harus di tengah/akhir
+    ]
+  }
+];
+
+/* ===========================================================
    ⭐ SEE MORE LINKS — tombol "See more" muncul di BAWAH grid
    portfolio (di tengah), tapi hanya untuk filter Animation,
    Animation Commercial, dan Asmr. Ganti "#" di bawah dengan link
@@ -1170,12 +1209,41 @@ function resolvePosterSrc(project, videoUrl){
   return `assets/portfolio/posters/${project.slug}.jpg`;
 }
 
+/* Detect whether a single GALLERY SLIDE (used by Product Design, Poster,
+   and Logo Design projects) is an image or a video, and if a video,
+   which kind (YouTube / Instagram / direct file). Local image files are
+   detected by extension; anything else defaults to "image" so plain
+   picture paths keep working exactly as before — this is what lets a
+   single project mix photos and videos in the same slideshow. */
+function detectSlideKind(src){
+  if(!src) return 'image';
+  if(/youtube\.com|youtu\.be/i.test(src)) return 'youtube';
+  if(/instagram\.com/i.test(src)) return 'instagram';
+  if(/\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(src)) return 'video-direct';
+  return 'image';
+}
+/* Best-effort preview picture for a single gallery slide. Images are used
+   as-is; YouTube videos use their official thumbnail; Instagram/direct
+   video slides have no easy still frame, so the caller falls back to the
+   generative canvas animation underneath instead of a broken image. */
+function resolveSlidePoster(src){
+  const kind = detectSlideKind(src);
+  if(kind === 'youtube'){
+    const id = extractYouTubeId(src);
+    if(id) return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+    return '';
+  }
+  if(kind === 'instagram' || kind === 'video-direct') return '';
+  return src;
+}
+
 /* ===========================================================
    ⭐ PROJECT MODAL (lightbox) — dipakai untuk semua "play"/"view"
    di Portfolio (video & product design) dan di Commercial Ads.
    Mendukung 3 tipe konten:
      - video   : embed YouTube/Instagram atau <video> langsung
-     - gallery : slideshow beberapa gambar (product design projects)
+     - gallery : slideshow beberapa slide, dan tiap slide BOLEH
+                 campur gambar & video (auto-detect per slide)
      - image   : satu gambar tunggal (ads showcase)
    =========================================================== */
 const projectModal = document.getElementById('project-modal');
@@ -1216,11 +1284,42 @@ function renderModalMedia(){
 
   if(modalState.type === 'gallery'){
     projectModalMedia.classList.add('is-gallery');
-    const img = document.createElement('img');
-    img.src = modalState.images[modalState.index];
-    img.alt = projectModalTitle.textContent;
-    img.onerror = ()=>{ img.style.display='none'; };
-    projectModalMedia.appendChild(img);
+    // Each gallery slide is auto-detected: image, YouTube, Instagram, or a
+    // direct video file — so a single project (e.g. Logo Design) can mix
+    // photos and videos in the same slideshow without any extra config.
+    const slideSrc = modalState.images[modalState.index];
+    const slideKind = detectSlideKind(slideSrc);
+    if(slideKind === 'youtube'){
+      const id = extractYouTubeId(slideSrc);
+      if(id){
+        const iframe = document.createElement('iframe');
+        iframe.src = buildYouTubeEmbedUrl(id, {autoplay:true});
+        iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+        iframe.allowFullscreen = true;
+        projectModalMedia.appendChild(iframe);
+      }
+    } else if(slideKind === 'instagram'){
+      const igSrc = extractInstagramEmbedSrc(slideSrc);
+      if(igSrc){
+        const iframe = document.createElement('iframe');
+        iframe.src = igSrc;
+        iframe.allow = 'autoplay; encrypted-media';
+        projectModalMedia.appendChild(iframe);
+      }
+    } else if(slideKind === 'video-direct'){
+      const video = document.createElement('video');
+      video.src = slideSrc;
+      video.controls = true;
+      video.autoplay = true;
+      video.playsInline = true;
+      projectModalMedia.appendChild(video);
+    } else {
+      const img = document.createElement('img');
+      img.src = slideSrc;
+      img.alt = projectModalTitle.textContent;
+      img.onerror = ()=>{ img.style.display='none'; };
+      projectModalMedia.appendChild(img);
+    }
   } else if(modalState.type === 'image'){
     const img = document.createElement('img');
     img.src = modalState.images[0];
@@ -1548,12 +1647,14 @@ projects.forEach((p,i)=>{
 });
 
 /* ===========================================================
-   RENDER PORTFOLIO GRID (image-gallery projects — Product Design & Poster)
-   Each card shows the first image as a poster with a small image
-   counter. Clicking it opens the full-size modal slideshow with
-   next/prev navigation and dots, so multiple images per project
-   can be browsed comfortably. Shared between DESIGN_PROJECTS_CONFIG
-   and POSTERS_CONFIG since both work the same way.
+   RENDER PORTFOLIO GRID (gallery projects — Product Design, Poster,
+   Logo Design). Each card shows a preview of the first slide with a
+   small counter badge. A project's "images" array can be ALL photos,
+   ALL videos, or a MIX of both — every slide is auto-detected (image
+   vs YouTube vs Instagram vs direct video file) both for the card's
+   preview picture and for what plays when the modal opens on that
+   slide, so the same slideshow can flip between photos and clips
+   with no extra config beyond listing the paths/links in order.
    =========================================================== */
 function renderGalleryCards(config, catKey, tagLabel, seedOffset){
   config.forEach((p,i)=>{
@@ -1562,18 +1663,40 @@ function renderGalleryCards(config, catKey, tagLabel, seedOffset){
     card.className = 'pf-card reveal';
     card.dataset.cat = catKey;
     card.dataset.kind = 'gallery';
-    const posterSrc = images[0] || '';
+
+    // Poster preview = first slide's image, or a YouTube thumbnail if the
+    // first slide is a YouTube video. Instagram/direct-video first slides
+    // have no easy still frame, so no <img> is rendered and the generative
+    // canvas animation underneath is shown instead (never a broken image).
+    const posterSrc = images.length ? resolveSlidePoster(images[0]) : '';
+
+    // Work out whether this project is all photos, all videos, or a mix,
+    // so the badge/icon can hint at that before the visitor even clicks in.
+    const videoCount = images.filter(src => detectSlideKind(src) !== 'image').length;
+    const isMixed = videoCount > 0 && videoCount < images.length;
+    const isAllVideo = images.length > 0 && videoCount === images.length;
+
+    let countBadge = '';
+    if(images.length > 1){
+      const icon = isMixed ? '🖼🎬' : (isAllVideo ? '🎬' : '🖼');
+      countBadge = `<span class="pf-img-count">${icon} 1/${images.length}</span>`;
+    }
+    const playIcon = images.length > 1 ? '⤢' : '▶';
+    const metaSuffix = images.length
+      ? ' · ' + images.length + (isMixed ? ' slides' : (isAllVideo ? ' videos' : ' images'))
+      : '';
+
     card.innerHTML = `
       <div class="pf-thumb">
         <canvas data-hue="${p.hue}" data-seed="${seedOffset+i}"></canvas>
         ${posterSrc ? `<img class="pf-poster" src="${posterSrc}" alt="${p.title} preview" loading="lazy" onerror="this.style.display='none'">` : ''}
         <span class="pf-cat-tag">${tagLabel}</span>
-        ${images.length > 1 ? `<span class="pf-img-count">🖼 1/${images.length}</span>` : ''}
-        <div class="pf-thumb-play"><span>${images.length > 1 ? '⤢' : '▶'}</span></div>
+        ${countBadge}
+        <div class="pf-thumb-play"><span>${playIcon}</span></div>
       </div>
       <div class="pf-body">
         <div class="pf-title">${p.title}</div>
-        <div class="pf-meta">${tagLabel.toUpperCase()} · ${p.year}${images.length ? ' · ' + images.length + ' images' : ''}</div>
+        <div class="pf-meta">${tagLabel.toUpperCase()} · ${p.year}${metaSuffix}</div>
       </div>`;
     card.addEventListener('click', ()=>{
       if(!images.length) return;
@@ -1590,6 +1713,7 @@ function renderGalleryCards(config, catKey, tagLabel, seedOffset){
 }
 renderGalleryCards(DESIGN_PROJECTS_CONFIG, 'product-design', 'Product Design', 100);
 renderGalleryCards(POSTERS_CONFIG, 'poster', 'Poster', 300);
+renderGalleryCards(LOGO_PROJECTS_CONFIG, 'logo', 'Logo Design', 500);
 
 /* "See more" button below the portfolio grid — only shown for the
    Animation, Animation Commercial, and Asmr filters, linking out to
