@@ -642,7 +642,9 @@ footer{padding:56px 0 40px;border-top:1px solid var(--border);}
   border:3px solid rgba(255,255,255,0.2);border-top-color:var(--teal);
   animation:pf-spin 0.8s linear infinite;
 }
-.project-modal-loading span{font-family:var(--font-mono);font-size:11.5px;color:rgba(243,241,234,0.75);letter-spacing:0.03em;}
+.project-modal-loading span{font-family:var(--font-mono);font-size:11.5px;color:rgba(243,241,234,0.75);letter-spacing:0.03em;max-width:280px;text-align:center;line-height:1.5;}
+.project-modal-loading.slow .pm-spinner{border-top-color:var(--coral);}
+.project-modal-loading.slow span{color:rgba(243,241,234,0.92);}
 .project-modal-nav{
   position:absolute;top:50%;transform:translateY(-50%);z-index:4;
   width:40px;height:40px;border-radius:50%;background:rgba(10,12,16,0.55);color:#fff;
@@ -734,7 +736,7 @@ body.modal-lock{overflow:hidden;}
   <div class="project-modal-inner">
     <button class="project-modal-close" id="project-modal-close" aria-label="Close">✕</button>
     <div class="project-modal-media" id="project-modal-media">
-      <div class="project-modal-loading" id="project-modal-loading"><div class="pm-spinner"></div><span>Loading…</span></div>
+      <div class="project-modal-loading" id="project-modal-loading"><div class="pm-spinner"></div><span id="project-modal-loading-text">Loading preview…</span></div>
       <button class="project-modal-nav prev" id="project-modal-prev" aria-label="Previous">‹</button>
       <button class="project-modal-nav next" id="project-modal-next" aria-label="Next">›</button>
       <div class="project-modal-dots" id="project-modal-dots"></div>
@@ -1072,16 +1074,21 @@ const VIDEO_CONFIG = {
     "garden-harvest":"https://youtube.com/shorts/CNU3fCcALEA?si=xgQKEBav20WBriDn",
     "supermarket":"https://youtube.com/shorts/uSrjwdkSRhg?si=fCCVY28eOvl4ddD-",
     "grace":"https://youtube.com/shorts/bPLnEkwZmJk",
-    "soklin":"https://youtu.be/5iOBjGD5kgs"
+    "soklin":"https://youtu.be/5iOBjGD5kgs",
+    "tumbler" : "https://youtu.be/RElXmA_Kwd0"
   }
 };
 
 /* ===========================================================
    ⭐ PRODUCT DESIGN CONFIG — taruh project product design kamu di
-   sini. Setiap project bisa punya BEBERAPA gambar (array "images")
-   yang otomatis bisa di-slide baik di thumbnail portfolio maupun di
-   modal saat dibuka. Kosongkan "images" kalau belum ada gambarnya,
-   otomatis fallback ke animasi generative canvas seperti card lain.
+   sini. Setiap project bisa punya BEBERAPA gambar DAN/ATAU video
+   (array "images") yang otomatis bisa di-slide baik di thumbnail
+   portfolio maupun di modal saat dibuka. Sistem otomatis mendeteksi
+   tiap slide itu gambar atau video (YouTube / Instagram / file .mp4
+   langsung) satu per satu, jadi kamu bisa selipkan link video di
+   posisi manapun dalam array — persis seperti pola di Logo Design.
+   Kosongkan "images" kalau belum ada isinya, otomatis fallback ke
+   animasi generative canvas seperti card lain.
    =========================================================== */
 const DESIGN_PROJECTS_CONFIG = [
   {
@@ -1091,10 +1098,25 @@ const DESIGN_PROJECTS_CONFIG = [
     hue: 172,
     desc: "",
     images: [
-      "assets/product_design/soklin/thumbnail.jpeg",
-      "assets/product_design/soklin/depan.jpeg",
-      "assets/product_design/soklin/belakang.jpeg",
-      "assets/product_design/soklin/kemasan.jpeg",
+      "assets/product_design/soklin/thumbnail.jpeg",   // slide 1 — foto
+      "assets/product_design/soklin/depan.jpeg",       // slide 2 — foto
+      "https://youtu.be/5iOBjGD5kgs",                   // slide 3 — VIDEO (contoh, ganti dengan link video proses kamu)
+      "assets/product_design/soklin/belakang.jpeg",    // slide 4 — foto lagi
+      "assets/product_design/soklin/kemasan.jpeg",     // slide 5 — foto lagi
+      // Video boleh diselipkan di slide manapun (awal/tengah/akhir),
+      // dan boleh pakai link YouTube, Instagram, atau file .mp4 langsung.
+    ]
+  },
+  {
+    title: "Design Tumbler",
+    slug: "tumbler",
+    year: "2026",
+    hue: 172,
+    desc: "",
+    images: [
+      "assets/product_design/tumbler/depan.jpeg",   // slide 1 — foto
+      "assets/product_design/tumbler/detail.jpeg",       // slide 2 — foto
+      "https://youtu.be/RElXmA_Kwd0"                  // slide 3 — VIDEO (contoh, ganti dengan link video proses kamu)    // slide 5 — foto lagi
     ]
   }
 ];
@@ -1151,9 +1173,19 @@ const LOGO_PROJECTS_CONFIG = [
       "assets/logo/verion/baju.jpeg",  
       "assets/logo/verion/parfum.jpeg",
       "https://youtu.be/XR7w5daIvy0"              // slide 5 — foto lagi
-      // Boleh juga pakai format "https://youtube.com/shorts/xxxxxxxxxxx"
-      // Video bisa diselipkan di slide manapun, tidak harus di tengah/akhir
     ]
+  },
+   {
+    title: "AUREN",
+    slug: "logo2",
+    year: "2026",
+    hue: 200,
+    desc: "",
+    images: [
+      "assets/logo/auren/logo.jpeg",          
+      "assets/logo/auren/produk.jpeg",         
+      "https://youtu.be/D0Te0qwAAxA"   
+   ]        
   }
 ];
 
@@ -1256,8 +1288,38 @@ const projectModalBackdrop = document.getElementById('project-modal-backdrop');
 const projectModalTitle = document.getElementById('project-modal-title');
 const projectModalDesc = document.getElementById('project-modal-desc');
 const projectModalTag = document.getElementById('project-modal-tag');
+const projectModalLoading = document.getElementById('project-modal-loading');
+const projectModalLoadingText = document.getElementById('project-modal-loading-text');
 
 let modalState = { type:null, images:[], index:0 };
+let modalLoadingTimeout = null;
+
+/* Shows the spinner + a message over the media area. Used both for the
+   initial "still loading" state and, after a timeout, for a softer
+   "this is a video preview, hang tight / check your connection" hint —
+   so a slow network never looks like a broken page. */
+function showModalLoading(msg, slow){
+  clearTimeout(modalLoadingTimeout);
+  projectModalLoadingText.textContent = msg || 'Loading preview…';
+  projectModalLoading.classList.toggle('slow', !!slow);
+  projectModalLoading.classList.add('show');
+}
+function hideModalLoading(){
+  clearTimeout(modalLoadingTimeout);
+  projectModalLoading.classList.remove('show','slow');
+}
+/* After SLOW_LOAD_MS of no confirmed load, swap the message to reassure
+   the visitor this is just a preview taking a moment — not a broken
+   embed — without interrupting anything that does finish loading. */
+const SLOW_LOAD_MS = 6000;
+function armSlowLoadingHint(){
+  clearTimeout(modalLoadingTimeout);
+  modalLoadingTimeout = setTimeout(()=>{
+    if(projectModalLoading.classList.contains('show')){
+      showModalLoading("This is a video preview — it's taking a little longer than usual. Please wait a moment or check your connection.", true);
+    }
+  }, SLOW_LOAD_MS);
+}
 
 function renderModalDots(){
   projectModalDots.innerHTML = '';
@@ -1282,6 +1344,12 @@ function renderModalMedia(){
   Array.from(projectModalMedia.querySelectorAll('img,video,iframe')).forEach(n=>n.remove());
   projectModalMedia.classList.remove('is-portrait','is-gallery');
 
+  // Reset the loading overlay for whatever is about to load. Images get
+  // their own quick "couldn't load" fallback below; video/embeds get the
+  // spinner + eventual "this is a preview, hang tight" hint via
+  // armSlowLoadingHint() so a slow connection never looks like a bug.
+  hideModalLoading();
+
   if(modalState.type === 'gallery'){
     projectModalMedia.classList.add('is-gallery');
     // Each gallery slide is auto-detected: image, YouTube, Instagram, or a
@@ -1292,39 +1360,61 @@ function renderModalMedia(){
     if(slideKind === 'youtube'){
       const id = extractYouTubeId(slideSrc);
       if(id){
+        showModalLoading('Loading video preview…');
+        armSlowLoadingHint();
         const iframe = document.createElement('iframe');
         iframe.src = buildYouTubeEmbedUrl(id, {autoplay:true});
         iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
         iframe.allowFullscreen = true;
+        iframe.addEventListener('load', hideModalLoading);
         projectModalMedia.appendChild(iframe);
+      } else {
+        showModalLoading("This video preview couldn't load. Please check your connection and try again.", true);
       }
     } else if(slideKind === 'instagram'){
       const igSrc = extractInstagramEmbedSrc(slideSrc);
       if(igSrc){
+        showModalLoading('Loading video preview…');
+        armSlowLoadingHint();
         const iframe = document.createElement('iframe');
         iframe.src = igSrc;
         iframe.allow = 'autoplay; encrypted-media';
+        iframe.addEventListener('load', hideModalLoading);
         projectModalMedia.appendChild(iframe);
+      } else {
+        showModalLoading("This video preview couldn't load. Please check your connection and try again.", true);
       }
     } else if(slideKind === 'video-direct'){
+      showModalLoading('Loading video preview…');
+      armSlowLoadingHint();
       const video = document.createElement('video');
       video.src = slideSrc;
       video.controls = true;
       video.autoplay = true;
       video.playsInline = true;
+      video.addEventListener('loadeddata', hideModalLoading);
+      video.addEventListener('error', ()=>{
+        showModalLoading("This is a video preview, but it couldn't be played right now. Please check your connection and try again in a moment.", true);
+      });
       projectModalMedia.appendChild(video);
     } else {
       const img = document.createElement('img');
       img.src = slideSrc;
       img.alt = projectModalTitle.textContent;
-      img.onerror = ()=>{ img.style.display='none'; };
+      img.onerror = ()=>{
+        img.style.display='none';
+        showModalLoading("This preview couldn't load. Please check your connection and try again.", true);
+      };
       projectModalMedia.appendChild(img);
     }
   } else if(modalState.type === 'image'){
     const img = document.createElement('img');
     img.src = modalState.images[0];
     img.alt = projectModalTitle.textContent;
-    img.onerror = ()=>{ img.style.display='none'; };
+    img.onerror = ()=>{
+      img.style.display='none';
+      showModalLoading("This preview couldn't load. Please check your connection and try again.", true);
+    };
     projectModalMedia.appendChild(img);
   } else if(modalState.type === 'video'){
     if(modalState.orientation === 'portrait') projectModalMedia.classList.add('is-portrait');
@@ -1333,26 +1423,42 @@ function renderModalMedia(){
     if(kind === 'youtube'){
       const id = extractYouTubeId(url);
       if(id){
+        showModalLoading('Loading video preview…');
+        armSlowLoadingHint();
         const iframe = document.createElement('iframe');
         iframe.src = buildYouTubeEmbedUrl(id, {autoplay:true});
         iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
         iframe.allowFullscreen = true;
+        iframe.addEventListener('load', hideModalLoading);
         projectModalMedia.appendChild(iframe);
+      } else {
+        showModalLoading("This video preview couldn't load. Please check your connection and try again.", true);
       }
     } else if(kind === 'instagram'){
       const src = extractInstagramEmbedSrc(url);
       if(src){
+        showModalLoading('Loading video preview…');
+        armSlowLoadingHint();
         const iframe = document.createElement('iframe');
         iframe.src = src;
         iframe.allow = 'autoplay; encrypted-media';
+        iframe.addEventListener('load', hideModalLoading);
         projectModalMedia.appendChild(iframe);
+      } else {
+        showModalLoading("This video preview couldn't load. Please check your connection and try again.", true);
       }
     } else if(kind === 'direct' && url){
+      showModalLoading('Loading video preview…');
+      armSlowLoadingHint();
       const video = document.createElement('video');
       video.src = url;
       video.controls = true;
       video.autoplay = true;
       video.playsInline = true;
+      video.addEventListener('loadeddata', hideModalLoading);
+      video.addEventListener('error', ()=>{
+        showModalLoading("This is a video preview, but it couldn't be played right now. Please check your connection and try again in a moment.", true);
+      });
       projectModalMedia.appendChild(video);
     }
   }
@@ -1373,6 +1479,7 @@ function closeProjectModal(){
   document.body.classList.remove('modal-lock');
   // stop any playing media by clearing it out
   Array.from(projectModalMedia.querySelectorAll('img,video,iframe')).forEach(n=>n.remove());
+  hideModalLoading();
 }
 function modalGalleryStep(dir){
   if(modalState.type !== 'gallery') return;
@@ -1598,7 +1705,8 @@ const projects = [
   {title:"The Beauty of Becoming", cat:"story", label:"Story", year:"2026", hue:14, slug:"The-Beauty-of-Becoming", orientation:"landscape"},
   {title:"This Pressure is Not a Punishment.", cat:"story", label:"Story", year:"2026", hue:14, slug:"Pressure", orientation:"landscape"},
   {title:"Blueprint For the Future", cat:"story", label:"Story", year:"2026", hue:14, slug:"blueprint-for-the-future", orientation:"landscape"},
-  {title:"Soklin Commercial", cat:"realistic-commercial", label:"Commercial", year:"2026", hue:18, slug:"soklin", orientation:"landscape"}
+  {title:"Soklin Commercial", cat:"realistic-commercial", label:"Commercial", year:"2026", hue:18, slug:"soklin", orientation:"landscape"},
+  {title:"Tumbler Commercial", cat:"realistic-commercial", label:"Commercial", year:"2026", hue:18, slug:"tumbler", orientation:"landscape"}
 ];
 
 const featured = [
