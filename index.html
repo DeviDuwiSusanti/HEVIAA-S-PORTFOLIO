@@ -178,6 +178,20 @@ nav{
   display:flex;align-items:center;gap:7px;
 }
 .nav-logo .rec{width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 8px var(--coral);}
+
+/* Logo image — auto-inserted by SITE_LOGO_CONFIG (see script) into any
+   element marked [data-logo-slot], right before its existing content, so
+   the wordmark/text stays and the logo simply sits beside it. */
+.logo-img{
+  height:22px;width:22px;object-fit:contain;border-radius:6px;flex-shrink:0;
+}
+.nav-logo.has-logo-img .logo-img{height:24px;width:24px;}
+#mobile-menu-logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:6px;}
+#mobile-menu-logo .logo-img{height:30px;width:30px;}
+.footer-brand{display:flex;align-items:center;gap:9px;}
+.footer-brand .logo-img{height:24px;width:24px;}
+.loader-mark.has-logo-img{gap:10px;}
+.loader-mark .logo-img{height:20px;width:20px;}
 .nav-links{display:flex;align-items:center;gap:2px;}
 .nav-links a{
   font-size:13px;color:var(--text-muted);padding:9px 13px;border-radius:100px;
@@ -680,7 +694,7 @@ body.modal-lock{overflow:hidden;}
 <body>
 
 <div id="loader">
-  <div class="loader-mark"><span class="dot"></span>INITIALIZING AI RENDER…</div>
+  <div class="loader-mark" data-logo-slot><span class="dot"></span>INITIALIZING AI RENDER…</div>
   <div class="loader-bar"><div class="loader-bar-fill"></div></div>
   <div class="loader-pct" id="loader-pct">0%</div>
 </div>
@@ -694,7 +708,7 @@ body.modal-lock{overflow:hidden;}
 
 <header>
   <nav>
-    <a href="#hero" class="nav-logo"><span class="rec"></span>HEVIAA.AI</a>
+    <a href="#hero" class="nav-logo" data-logo-slot><span class="rec"></span>HEVIAA.AI</a>
     <div class="nav-links">
       <a href="#hero">Home</a>
       <a href="#portfolio">Portfolio</a>
@@ -716,6 +730,7 @@ body.modal-lock{overflow:hidden;}
 </header>
 
 <div id="mobile-menu">
+  <div id="mobile-menu-logo" data-logo-slot></div>
   <a href="#hero">Home</a>
   <a href="#portfolio">Portfolio</a>
   <a href="#featured">Projects</a>
@@ -950,7 +965,7 @@ body.modal-lock{overflow:hidden;}
 <footer>
   <div class="wrap footer-grid">
     <div class="footer-left">
-      <div class="footer-brand">HEVIAA.AI</div>
+      <div class="footer-brand" data-logo-slot>HEVIAA.AI</div>
       <div class="footer-copy">© 2026 Heviaa. All rights reserved.</div>
     </div>
     <nav class="footer-nav">
@@ -1019,6 +1034,50 @@ body.modal-lock{overflow:hidden;}
 
   window.__getTheme = () => currentTheme;
 })();
+
+/* ===========================================================
+   ⭐ SITE LOGO CONFIG — taruh path/link gambar logo kamu di sini.
+   Dipakai otomatis di: navbar (desktop + mobile), loader awal,
+   footer, dan favicon tab browser.
+   Kosongkan ("") kalau belum ada -> otomatis fallback ke tampilan
+   teks/ikon lama (dot merah + "HEVIAA.AI"), tidak ada broken image.
+   =========================================================== */
+const SITE_LOGO_CONFIG = {
+  src: "assets/logo_heviaa.png",   // <- ganti/upload file logo kamu ke path ini
+  alt: "Heviaa.AI logo"
+};
+function trySetLogo(el, src, alt){
+  if(!src) return; // kosong -> biarkan fallback teks/ikon lama tetap tampil
+  const img = new Image();
+  img.onload = () => {
+    el.classList.add('has-logo-img');
+    const imgEl = document.createElement('img');
+    imgEl.src = src;
+    imgEl.alt = alt || '';
+    imgEl.className = 'logo-img';
+    el.prepend(imgEl);
+  };
+  img.onerror = () => { /* file belum ada / gagal load -> fallback lama tetap dipakai */ };
+  img.src = src;
+}
+document.querySelectorAll('[data-logo-slot]').forEach(el=>{
+  trySetLogo(el, SITE_LOGO_CONFIG.src, SITE_LOGO_CONFIG.alt);
+});
+// Favicon tab browser — hanya diganti kalau file logo berhasil dimuat
+if(SITE_LOGO_CONFIG.src){
+  const testImg = new Image();
+  testImg.onload = () => {
+    let link = document.querySelector("link[rel~='icon']");
+    if(!link){
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+    }
+    link.href = SITE_LOGO_CONFIG.src;
+  };
+  testImg.onerror = () => {};
+  testImg.src = SITE_LOGO_CONFIG.src;
+}
 
 /* ===========================================================
    ⭐ VIDEO CONFIG — taruh SEMUA link video kamu di sini saja.
@@ -1118,6 +1177,18 @@ const DESIGN_PROJECTS_CONFIG = [
       "assets/product_design/tumbler/detail.jpeg",       // slide 2 — foto
       "https://youtu.be/RElXmA_Kwd0"                  // slide 3 — VIDEO (contoh, ganti dengan link video proses kamu)    // slide 5 — foto lagi
     ]
+  },
+  {
+    title: "Stacked Lunchbox Design",
+    slug: "rantang",
+    year: "2026",
+    hue: 172,
+    desc: "",
+    images: [
+      "assets/product_design/rantang/depan.jpeg",   // slide 1 — foto
+      "assets/product_design/rantang/detail.jpeg",       // slide 2 — foto
+      "https://youtu.be/CKBMFhqalUo"                  // slide 3 — VIDEO (contoh, ganti dengan link video proses kamu)    // slide 5 — foto lagi
+    ]
   }
 ];
 
@@ -1130,33 +1201,19 @@ const DESIGN_PROJECTS_CONFIG = [
    =========================================================== */
 const POSTERS_CONFIG = [
   {
-    title: "Example 1",
+    title: "VYRA",
     slug: "poster1",
     year: "2026",
     hue: 14,
     desc: "",
     images: [
-      "assets/poster/1.jpeg"
+      "assets/poster/hp/1.jpeg",
+      "assets/poster/hp/2.jpeg",
+      "assets/poster/hp/3.jpeg"
     ]
   }
 ];
 
-/* ===========================================================
-   ⭐ LOGO DESIGN CONFIG — taruh project logo design kamu di sini.
-   Tampilan kartunya SAMA PERSIS dengan Product Design/Poster (pakai
-   fungsi render yang sama), bedanya array "images" di sini boleh
-   CAMPUR antara FOTO (.jpg/.png/.webp) dan VIDEO (link YouTube,
-   link Instagram, atau file .mp4 langsung) — urutannya BEBAS, video
-   boleh diselipkan di slide manapun (awal/tengah/akhir), tidak harus
-   dikelompokkan. Sistem otomatis mendeteksi tiap slide itu gambar
-   atau video satu per satu, jadi tidak perlu setting tambahan selain
-   urutan path/link-nya di array.
-
-   Contoh di bawah ini: slide 1 & 2 foto, slide 3 VIDEO proses, slide
-   4 & 5 foto lagi. Ganti/tambah/hapus baris sesuai project kamu.
-   Kosongkan "images" (jadi array kosong []) kalau project belum ada
-   isinya — otomatis fallback ke animasi generative canvas.
-   =========================================================== */
 const LOGO_PROJECTS_CONFIG = [
   {
     title: "VERION",
@@ -1185,6 +1242,18 @@ const LOGO_PROJECTS_CONFIG = [
       "assets/logo/auren/logo.jpeg",          
       "assets/logo/auren/produk.jpeg",         
       "https://youtu.be/D0Te0qwAAxA"   
+   ]        
+  },
+  {
+    title: "VELORA",
+    slug: "logo3",
+    year: "2026",
+    hue: 200,
+    desc: "",
+    images: [
+      "assets/logo/velora/logo.jpeg",          
+      "assets/logo/velora/produk.jpeg",         
+      "https://youtu.be/5VpcPEVVJwQ"   
    ]        
   }
 ];
@@ -1574,6 +1643,7 @@ const BRANDS_CONFIG = [
    tidak perlu ubah bagian HTML atau CSS manapun.
    =========================================================== */
 const CERTIFICATES_CONFIG = [
+  { title: "Bootcamp Sertifikasi Microsoft Office Excel, Word & Power Point Specialist", issuer: "Karirnex", date: "2026", file: "assets/sertifikat/microsoft.pdf", url: "" },
   { title: "Data Science Fundamentals", issuer: "DQLab", date: "2024", file: "assets/sertifikat/dqlab.pdf", url: "" },
   { title: "Web Programming Intern", issuer: "Diskominfo", date: "2025", file: "assets/sertifikat/magang.pdf", url: "" },
   { title: "Novo Club Leadership Bootcamp", issuer: "ParagonCorp", date: "2024", file: "assets/sertifikat/novo_1.pdf", url: "" },
