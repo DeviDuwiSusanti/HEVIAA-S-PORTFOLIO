@@ -468,6 +468,37 @@ h1.hero-name .accent{color:var(--teal);}
 @media (max-width:680px){.pipeline{flex-direction:column;gap:28px;}.pipeline::before,.pipeline-track{width:1px;height:100%;left:50%;top:0;}.pipe-step{flex-direction:row;padding:0;}}
 
 /* ============================================
+   SKILLS
+   ============================================ */
+.skills-groups{display:flex;flex-direction:column;gap:44px;}
+.skill-group-head{
+  display:flex;align-items:center;gap:12px;margin-bottom:18px;
+  font-family:var(--font-mono);font-size:12.5px;color:var(--text-muted);letter-spacing:0.05em;
+}
+.skill-group-head .count{color:var(--teal);}
+.skill-group-head::after{content:'';flex:1;height:1px;background:var(--border);}
+.skill-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;}
+.skill-card{
+  display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;
+  border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-m);
+  padding:22px 12px 18px;
+  transition:transform 0.25s ease,border-color 0.25s ease,box-shadow 0.25s ease,background-color 0.3s ease;
+}
+.skill-card:hover{
+  transform:translateY(-5px);border-color:var(--teal);
+  box-shadow:0 0 0 1px rgba(69,224,196,0.35),0 14px 28px rgba(69,224,196,0.12);
+}
+.skill-logo{
+  width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.94);border:1px solid var(--border);overflow:hidden;
+  font-family:var(--font-mono);font-weight:500;font-size:14px;color:#14171c;
+}
+.skill-logo img{width:100%;height:100%;object-fit:contain;padding:9px;}
+.skill-name{font-size:13.5px;font-weight:500;color:var(--text-muted);transition:color 0.2s ease;}
+.skill-card:hover .skill-name{color:var(--text);}
+@media (max-width:560px){.skill-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* ============================================
    CLIENTS / PROJECT COUNT
    ============================================ */
 .stat-banner{
@@ -713,6 +744,7 @@ body.modal-lock{overflow:hidden;}
       <a href="#hero">Home</a>
       <a href="#portfolio">Portfolio</a>
       <a href="#featured">Projects</a>
+      <a href="#skills">Skills</a>
       <a href="#clients">Clients</a>
       <a href="#certificates">Certificates</a>
       <a href="#social">Social</a>
@@ -734,6 +766,7 @@ body.modal-lock{overflow:hidden;}
   <a href="#hero">Home</a>
   <a href="#portfolio">Portfolio</a>
   <a href="#featured">Projects</a>
+  <a href="#skills">Skills</a>
   <a href="#clients">Clients</a>
   <a href="#certificates">Certificates</a>
   <a href="#social">Social</a>
@@ -878,6 +911,16 @@ body.modal-lock{overflow:hidden;}
   </div>
 </section>
 
+<!-- ============ SKILLS ============ -->
+<section id="skills">
+  <div class="wrap">
+    <div class="eyebrow"><span class="tc">02:00</span> SKILLS</div>
+    <h2 class="section-title">Tools &amp; tech I work with</h2>
+    <p class="section-sub">From AI generation to code and design, the toolkit behind every project.</p>
+    <div class="skills-groups" id="skills-groups"></div>
+  </div>
+</section>
+
 <!-- ============ CLIENTS / BRANDS ============ -->
 <section id="clients">
   <div class="wrap">
@@ -973,6 +1016,7 @@ body.modal-lock{overflow:hidden;}
       <a href="#hero">Home</a>
       <a href="#portfolio">Portfolio</a>
       <a href="#featured">Projects</a>
+      <a href="#skills">Skills</a>
       <a href="#clients">Clients</a>
       <a href="#certificates">Certificates</a>
       <a href="#social">Social</a>
@@ -1044,7 +1088,7 @@ body.modal-lock{overflow:hidden;}
    teks/ikon lama (dot merah + "HEVIAA.AI"), tidak ada broken image.
    =========================================================== */
 const SITE_LOGO_CONFIG = {
-  src: "assets/logo_heviaa.png",   // <- ganti/upload file logo kamu ke path ini
+  src: "logo_heviaa.png",   // <- file logo ada di folder utama, sejajar dengan index.html
   alt: "Heviaa.AI logo"
 };
 function trySetLogo(el, src, alt){
@@ -2483,6 +2527,81 @@ document.querySelectorAll('.pf-thumb canvas, .ads-slide canvas').forEach(renderG
     requestAnimationFrame(draw);
   }
   if(!reduceMotion) draw(); else { t=0; draw(); }
+})();
+
+/* ===========================================================
+   ⭐ SKILLS CONFIG — edit/tambah skill di sini.
+   "logo" = path/link gambar. Kalau gagal load -> fallback inisial.
+   Logo programming/Figma/Canva otomatis dari CDN Devicon.
+   Logo lainnya: simpan PNG di assets/skills/ sesuai nama di bawah.
+   =========================================================== */
+const DEVICON = (name, variant='original') =>
+  `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${name}/${name}-${variant}.svg`;
+
+const SKILLS_CONFIG = [
+  { group: "AI Tools", items: [
+    { name: "ChatGPT",  logo: "assets/skills/gpt.png" },
+    { name: "Gemini",   logo: "assets/skills/veo.png" },
+    { name: "Claude",   logo: "assets/skills/claude.png" },
+    { name: "Flow AI",  logo: "assets/skills/flow.png" },
+  ]},
+  { group: "AI Models", items: [
+    { name: "Nano Banana", logo: "assets/skills/nano banana.png" },
+    { name: "Veo",         logo: "assets/skills/veo.png" },
+    { name: "Omni Flash",  logo: "assets/skills/veo.png" },
+  ]},
+    { group: "Editing & Design", items: [
+    { name: "CapCut", logo: "assets/skills/capcut.png" },
+    { name: "Figma",  logo: DEVICON('figma') },
+    { name: "Canva",  logo: DEVICON('canva') },
+  ]},
+  { group: "Microsoft Office", items: [
+    { name: "Microsoft Office",       logo: "assets/skills/microsoft.png" }
+  ]},
+  { group: "Programming", items: [
+    { name: "Python",       logo: DEVICON('python') },
+    { name: "HTML",         logo: DEVICON('html5') },
+    { name: "CSS",          logo: DEVICON('css3') },
+    { name: "JavaScript",   logo: DEVICON('javascript') },
+    { name: "PHP",          logo: DEVICON('php') },
+    { name: "Bootstrap",    logo: DEVICON('bootstrap') },
+    { name: "Google Colab", logo: DEVICON('googlecolab') },
+    { name: "VS Code",      logo: DEVICON('vscode') },
+    { name: "GitHub",       logo: DEVICON('github') },
+  ]},
+];
+
+(function(){
+  const root = document.getElementById('skills-groups');
+  if(!root) return;
+  // Semua skill digabung jadi 1 grid (tanpa dipisah per kategori)
+  const allSkills = SKILLS_CONFIG.flatMap(g => g.items);
+  [allSkills].forEach(items=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'reveal';
+    wrap.innerHTML = `<div class="skill-grid"></div>`;
+    const gridEl = wrap.querySelector('.skill-grid');
+    items.forEach(s=>{
+      const initials = s.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const card = document.createElement('div');
+      card.className = 'skill-card';
+      card.innerHTML = `<div class="skill-logo">${initials}</div><div class="skill-name">${s.name}</div>`;
+      if(s.logo){
+        const img = new Image();
+        img.onload = ()=>{
+          const el = card.querySelector('.skill-logo');
+          el.innerHTML = '';
+          img.alt = s.name;
+          el.appendChild(img);
+        };
+        img.onerror = ()=>{ /* logo belum ada -> inisial tetap dipakai */ };
+        img.src = s.logo;
+      }
+      gridEl.appendChild(card);
+    });
+    root.appendChild(wrap);
+    io.observe(wrap); // pakai observer reveal yang sudah ada
+  });
 })();
 
 </script>
