@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Heru — AI Content Creator</title>
+<title>Devi Duwi Susanti - Portfolio</title>
 <meta name="description" content="Heru — AI Content Creator specializing in AI Animation, Product Commercials, Educational Content and Motion Videos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -871,13 +871,13 @@ body.modal-lock{overflow:hidden;}
     <h2 class="section-title">Selected work</h2>
     <p class="section-sub">Filter by category to explore the craft behind each frame.</p>
     <div class="filters" id="filters">
-      <button class="filter-btn" data-filter="product-design">Product Design</button>
-      <button class="filter-btn" data-filter="poster">Poster</button>
-      <button class="filter-btn" data-filter="logo">Logo Design</button>
+      <button class="filter-btn active" data-filter="poster">Poster</button>
       <button class="filter-btn" data-filter="realistic-commercial">Realistic Commercial</button>
       <button class="filter-btn" data-filter="animation-commercial">Animation Commercial</button>
-      <button class="filter-btn active" data-filter="animation">Animation</button>
+      <button class="filter-btn" data-filter="animation">Animation</button>
       <button class="filter-btn" data-filter="education">Education</button>
+      <button class="filter-btn" data-filter="product-design">Product Design</button>
+      <button class="filter-btn" data-filter="logo">Logo Design</button>
       <button class="filter-btn" data-filter="story">Story</button>
       <button class="filter-btn" data-filter="motion">Motion</button>
       <button class="filter-btn" data-filter="asmr">Asmr</button>
@@ -1185,6 +1185,7 @@ const VIDEO_CONFIG = {
     "xlsmart" : "https://youtube.com/shorts/FnO3JU2kOWw?feature=share",
     "education-1": "https://youtu.be/OVkvZX9FIPk?si=AuLnDdPs0n9Tqy7L",
     "education-2": "https://youtu.be/cWgzqyRq85A?si=AzArjcAPPY36v3LB",
+    "education-3" : "https://youtu.be/FwciqFK9IOE",
     "motion-1": "https://youtu.be/J50xOLa2X0A",
     "motion-2": "https://youtu.be/Th82zX00B94"
   }
@@ -1235,25 +1236,74 @@ const DESIGN_PROJECTS_CONFIG = [
 
 const POSTERS_CONFIG = [
   {
-    title: "VYRA",
+    title: "Lowongan Kerja",
     slug: "poster1",
     year: "2026",
     hue: 14,
     desc: "",
     images: [
-      "assets/poster/hp/1.jpeg",
-      "assets/poster/hp/2.jpeg",
-      "assets/poster/hp/3.jpeg"
+      "assets/poster/poster1/1.png",
+      "assets/poster/poster1/2.png",
+      "assets/poster/poster1/3.png"
     ]
   },
   {
-    title: "XLSMART",
+    title: "Event",
     slug: "poster2",
     year: "2026",
     hue: 14,
     desc: "",
     images: [
-      "assets/poster/xlsmart/1.jpeg"
+      "assets/poster/poster2/1.png",
+      "assets/poster/poster2/2.png",
+      "assets/poster/poster2/3.png",
+    ]
+  },
+  {
+    title: "Discount Event",
+    slug: "poster3",
+    year: "2026",
+    hue: 14,
+    desc: "",
+    images: [
+      "assets/poster/poster3/1.png",
+      "assets/poster/poster3/2.png",
+      "assets/poster/poster3/3.png",
+    ]
+  },
+  {
+    title: "Grand Opening",
+    slug: "poster4",
+    year: "2026",
+    hue: 14,
+    desc: "",
+    images: [
+      "assets/poster/poster4/1.png",
+      "assets/poster/poster4/2.png",
+      "assets/poster/poster4/3.png",
+    ]
+  },
+{
+    title: "Smartphone New Launching",
+    slug: "poster5",
+    year: "2026",
+    hue: 14,
+    desc: "",
+    images: [
+      "assets/poster/poster5/1.png",
+      "assets/poster/poster5/2.png",
+      "assets/poster/poster5/3.png",
+    ]
+  },
+  {
+    title: "New Drink",
+    slug: "poster9",
+    year: "2026",
+    hue: 14,
+    desc: "",
+    images: [
+      "assets/poster/poster9/1.png",
+      "assets/poster/poster9/2.png"
     ]
   }
 ];
@@ -1726,7 +1776,7 @@ document.querySelectorAll('.btn').forEach(btn=>{
    =========================================================== */
 (function(){
   const el = document.getElementById('hero-role-text');
-  const roles = ['DATA ANALYST', 'DATA ENTRY', 'DATA PROCESSING', 'AI CONTENT CREATOR','AI ANIMATION ARTIST','PRODUCT DESIGNER','COMMERCIAL AD CREATOR','COMMERCIAL AI DESIGNER','AI FILMMAKER'];
+  const roles = ['SOCIAL MEDIA SPECIALIST', 'CONTENT WRITER', 'AI CONTENT CREATOR', 'AI ANIMATION ARTIST','PRODUCT DESIGNER','COMMERCIAL AD CREATOR','COMMERCIAL AI DESIGNER', 'DATA ANALYST', 'DATA ENTRY', 'DATA PROCESSING','AI FILMMAKER'];
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#%&$*';
   let roleIndex = 0;
   if(reduceMotionCheck()) return;
@@ -1803,6 +1853,7 @@ const projects = [
   {title:"XL, Axis, Smartfren", cat:"realistic-commercial", label:"Commercial", year:"2026", hue:18, slug:"xlsmart", orientation:"landscape"},
   {title:"Education Video 1", cat:"education", label:"Education", year:"2026", hue:200, slug:"education-1", orientation:"landscape"},
   {title:"Education Video 2", cat:"education", label:"Education", year:"2026", hue:200, slug:"education-2", orientation:"landscape"},
+  {title:"Education Video 3", cat:"education", label:"Education", year:"2026", hue:200, slug:"education-3", orientation:"landscape"},
   {title:"Payments", cat:"motion", label:"Motion", year:"2026", hue:260, slug:"motion-1", orientation:"landscape"},
   {title:"Wedding", cat:"motion", label:"Motion", year:"2026", hue:260, slug:"motion-2", orientation:"landscape"}
 ];
