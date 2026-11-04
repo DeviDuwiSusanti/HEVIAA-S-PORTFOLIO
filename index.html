@@ -1150,7 +1150,7 @@ const VIDEO_CONFIG = {
     "Comedo": "https://youtube.com/shorts/CJCs7FJ6_T8?feature=share",
     "Tips-for-Applying-Lipstick":"https://youtube.com/shorts/X-RB3y8OEPk?feature=share",
     "Natural-Tips-for-Treating-Acne":"https://youtube.com/shorts/ZLMxm0uMz78?feature=share",
-    "Types-of-facial-skin": "https://youtube.com/shorts/qGBVuqqeCjI?feature=share",
+    "tandon": "https://youtube.com/shorts/EbFNm_go1N4?feature=share",
     "What-is-niacinamide?": "https://youtube.com/shorts/tJPOludIw3w?feature=share",
     "Facerinna-Glowing-Set": "https://youtube.com/shorts/E6VYf35qZ_A?feature=share",
     "Facerinna-Acne-Set": "https://youtube.com/shorts/Emu7yFvVxDM?feature=share",
@@ -1185,7 +1185,8 @@ const VIDEO_CONFIG = {
     "xlsmart" : "https://youtube.com/shorts/FnO3JU2kOWw?feature=share",
     "education-1": "https://youtu.be/OVkvZX9FIPk?si=AuLnDdPs0n9Tqy7L",
     "education-2": "https://youtu.be/cWgzqyRq85A?si=AzArjcAPPY36v3LB",
-    "education-3" : "https://youtu.be/FwciqFK9IOE",
+    "education-3" : "https://youtu.be/Z7A_2Jbrjr8",
+    "education-4" : "https://youtu.be/FwciqFK9IOE",
     "motion-1": "https://youtu.be/J50xOLa2X0A",
     "motion-2": "https://youtu.be/Th82zX00B94"
   }
@@ -1703,6 +1704,7 @@ const BRANDS_CONFIG = [
   { name: "Grace And Glow", logo: "assets/brands/graceandglow.png" },
   { name: "OMG", logo: "assets/brands/omg.png" },
   { name: "O.TWO.O", logo: "assets/brands/two.png" },
+  { name: "Noera", logo: "assets/brands/noera.png" },
   { name: "Rintik", logo: "assets/brands/rintik.png" },
   { name: "Elformula", logo: "assets/brands/elformula.png" },
   { name: "LumiXpert", logo: "assets/brands/lumiXpert.png" },
@@ -1814,8 +1816,9 @@ document.querySelectorAll('.btn').forEach(btn=>{
 DATA
 =========================================================== */
 const projects = [
+  {title:"Reservoir Water Trip", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"tandon", orientation:"landscape"},
   {title:"Mineral Water", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"water", orientation:"landscape"},
-    {title:"Various Types of Acne", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"acne", orientation:"landscape"},
+  {title:"Various Types of Acne", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"acne", orientation:"landscape"},
   {title:"Iphone", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"iphone", orientation:"landscape"},
   {title:"Luwak Coffe", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"luwak-coffe", orientation:"landscape"},
   {title:"Reasons Why Makeup Smudges Easily", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"Reasons-Why-Makeup-Smudges-Easily", orientation:"landscape"},
@@ -1828,7 +1831,6 @@ const projects = [
   {title:"Making a Fruit Dessert 🍓🥝🍊🎧", cat:"asmr", label:"Asmr", year:"2026", hue:19, slug:"making-dessert", orientation:"landscape"},
   {title:"Origin Coconut Oil", cat:"realistic-commercial", label:"Commercial", year:"2026", hue:18, slug:"origin", orientation:"landscape"},
   {title:"Grace And Glow", cat:"realistic-commercial", label:"Commercial", year:"2026", hue:18, slug:"grace", orientation:"landscape"},
-  {title:"Types of Facial Skin", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"Types-of-facial-skin", orientation:"landscape"},
   {title:"What is Niacinamide?", cat:"animation", label:"Animation", year:"2026", hue:172, slug:"What-is-niacinamide?", orientation:"landscape"},
   {title:"Facerinna Glowing Set", cat:"animation-commercial", label:"Commercial", year:"2026", hue:14, slug:"Facerinna-Glowing-Set", orientation:"landscape"},
   {title:"Facerinna Glowing Set", cat:"animation-commercial", label:"Commercial", year:"2026", hue:14, slug:"Facerinna-Acne-Set", orientation:"landscape"},
@@ -1854,6 +1856,7 @@ const projects = [
   {title:"Education Video 1", cat:"education", label:"Education", year:"2026", hue:200, slug:"education-1", orientation:"landscape"},
   {title:"Education Video 2", cat:"education", label:"Education", year:"2026", hue:200, slug:"education-2", orientation:"landscape"},
   {title:"Education Video 3", cat:"education", label:"Education", year:"2026", hue:200, slug:"education-3", orientation:"landscape"},
+  {title:"Education Video 4", cat:"education", label:"Education", year:"2026", hue:200, slug:"education-4", orientation:"landscape"},
   {title:"Payments", cat:"motion", label:"Motion", year:"2026", hue:260, slug:"motion-1", orientation:"landscape"},
   {title:"Wedding", cat:"motion", label:"Motion", year:"2026", hue:260, slug:"motion-2", orientation:"landscape"}
 ];
@@ -2040,7 +2043,7 @@ featured.forEach(f=>{
   // Sebelumnya angka ini dihitung otomatis dari jumlah project berkategori
   // "animation-commercial"/"realistic-commercial" di array "projects".
   // Sekarang tinggal ubah angkanya langsung, tidak perlu utak-atik array projects.
-  const totalProjects = 40; // <-- ganti angka ini sesuai jumlah project brand yang sudah selesai & disetujui
+  const totalProjects = 50; // <-- ganti angka ini sesuai jumlah project brand yang sudah selesai & disetujui
   const totalBrands = BRANDS_CONFIG.length;
   document.getElementById('stat-brands').textContent = totalBrands + '+';
 
